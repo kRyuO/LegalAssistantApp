@@ -1,0 +1,85 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:LegalAssistantApp.ViewModels;assembly=LegalAssistantApp"
+        x:Class="LegalAssistantApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Legal Assistant" 
+        Width="1200" Height="700"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#f8f9fa"/>
+        </Style>
+        <Style Selector="Border#sidebar">
+            <Setter Property="Background" Value="#2e7d32"/>
+            <Setter Property="Width" Value="250"/>
+        </Style>
+        <Style Selector="Button.menu">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.menu:pointerover">
+            <Setter Property="Background" Value="#1b5e20"/>
+        </Style>
+        <Style Selector="Button.logout">
+            <Setter Property="Background" Value="#c62828"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Classes="sidebar">
+            <StackPanel>
+                <TextBlock Text="Legal Assistant" 
+                           Foreground="White" 
+                           FontSize="18" 
+                           FontWeight="Bold"
+                           Margin="20,30,20,40"
+                           HorizontalAlignment="Center"/>
+                
+                <StackPanel Spacing="2" Margin="0,0,0,30">
+                    <Button Content="📊 Главная" Classes="menu" Command="{Binding ShowHomeCommand}"/>
+                    <Button Content="👥 Контрагенты" Classes="menu" Command="{Binding ShowCounterpartiesCommand}"/>
+                    <Button Content="📄 Документы" Classes="menu" Command="{Binding ShowDocumentsCommand}"/>
+                    <Button Content="📅 События" Classes="menu"/>
+                    <Button Content="⚙️ Настройки" Classes="menu"/>
+                </StackPanel>
+
+                <Button Content="🚪 Выход" 
+                        Classes="logout"
+                        Command="{Binding LogoutCommand}"
+                        Margin="20,0,20,20"
+                        VerticalAlignment="Bottom"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Background="White" Margin="10">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding WelcomeMessage}" 
+                           FontSize="20" 
+                           Foreground="#2e7d32"
+                           FontWeight="SemiBold"/>
+                <TextBlock Text="Выберите раздел в меню слева для начала работы" 
+                           FontSize="14" 
+                           Foreground="#666"
+                           Margin="0,10,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
