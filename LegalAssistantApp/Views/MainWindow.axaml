@@ -1,85 +1,368 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LegalAssistantApp.ViewModels;assembly=LegalAssistantApp"
+        xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
         x:Class="LegalAssistantApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Legal Assistant" 
-        Width="1200" Height="700"
+        Title="Legal Assistant"
+        Width="1200"
+        Height="700"
         WindowStartupLocation="CenterScreen">
 
-    <Window.Styles>
-        <Style Selector="Window">
-            <Setter Property="Background" Value="#f8f9fa"/>
-        </Style>
-        <Style Selector="Border#sidebar">
-            <Setter Property="Background" Value="#2e7d32"/>
-            <Setter Property="Width" Value="250"/>
-        </Style>
-        <Style Selector="Button.menu">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20,15"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-        <Style Selector="Button.menu:pointerover">
-            <Setter Property="Background" Value="#1b5e20"/>
-        </Style>
-        <Style Selector="Button.logout">
-            <Setter Property="Background" Value="#c62828"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20,12"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-    </Window.Styles>
+  <Window.Styles>
+    <Style Selector="Window">
+      <Setter Property="Background" Value="#eef1f5" />
+    </Style>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Style Selector="Border#sidebar">
+      <Setter Property="Background" Value="#f3f5f8" />
+      <Setter Property="Width" Value="260" />
+    </Style>
 
-        <Border Grid.Column="0" Classes="sidebar">
-            <StackPanel>
-                <TextBlock Text="Legal Assistant" 
-                           Foreground="White" 
-                           FontSize="18" 
-                           FontWeight="Bold"
-                           Margin="20,30,20,40"
-                           HorizontalAlignment="Center"/>
-                
-                <StackPanel Spacing="2" Margin="0,0,0,30">
-                    <Button Content="📊 Главная" Classes="menu" Command="{Binding ShowHomeCommand}"/>
-                    <Button Content="👥 Контрагенты" Classes="menu" Command="{Binding ShowCounterpartiesCommand}"/>
-                    <Button Content="📄 Документы" Classes="menu" Command="{Binding ShowDocumentsCommand}"/>
-                    <Button Content="📅 События" Classes="menu"/>
-                    <Button Content="⚙️ Настройки" Classes="menu"/>
-                </StackPanel>
+    <Style Selector="Button.menu">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#333333" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="18,8" />
+      <Setter Property="Margin" Value="12,4,12,4" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
 
-                <Button Content="🚪 Выход" 
-                        Classes="logout"
-                        Command="{Binding LogoutCommand}"
-                        Margin="20,0,20,20"
-                        VerticalAlignment="Bottom"/>
+    <Style Selector="Button.menu:pointerover">
+      <Setter Property="Background" Value="#dde5f0" />
+      <Setter Property="Foreground" Value="#333333" />
+    </Style>
+
+    <Style Selector="Button.logout">
+      <Setter Property="Background" Value="#c62828" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Margin" Value="40,0,40,24" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="Button.logout:pointerover">
+      <Setter Property="Background" Value="#b71c1c" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Window.Styles>
+
+  <!-- шаблоны содержимого правой части -->
+  <Window.DataTemplates>
+
+    <!-- Домашний экран (приветствие) -->
+    <DataTemplate x:DataType="vm:MainWindowViewModel">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="{Binding WelcomeMessage}"
+                   FontSize="22"
+                   Foreground="#2e7d32"
+                   FontWeight="SemiBold" />
+        <TextBlock Text="Выберите раздел в меню слева для начала работы"
+                   FontSize="14"
+                   Foreground="#666"
+                   Margin="0,10,0,0" />
+      </StackPanel>
+    </DataTemplate>
+
+    <!-- Контрагенты -->
+    <DataTemplate x:DataType="vm:CounterpartyViewModel">
+      <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+        <!-- поиск + основные кнопки -->
+        <Grid ColumnDefinitions="260,Auto,Auto,Auto,Auto" Margin="0,0,0,10">
+          <TextBox Grid.Column="0"
+                   Height="30"
+                   Watermark="Поиск по наименованию, ИНН, ОГРН"
+                   Text="{Binding SearchText, Mode=TwoWay}" />
+          <Button Grid.Column="1" Content="Найти"
+                  Command="{Binding SearchCommand}" MinWidth="80" Margin="8,0,0,0" />
+          <Button Grid.Column="2" Content="Добавить"
+                  Command="{Binding AddNewCommand}" MinWidth="90" Margin="8,0,0,0" />
+          <Button Grid.Column="3" Content="Сохранить"
+                  Command="{Binding SaveCommand}" MinWidth="100"
+                  IsEnabled="{Binding SelectedCounterparty}" Margin="8,0,0,0" />
+          <Button Grid.Column="4" Content="Удалить"
+                  Command="{Binding DeleteCommand}" MinWidth="90"
+                  IsEnabled="{Binding SelectedCounterparty}" Margin="8,0,0,0" />
+        </Grid>
+
+        <!-- FNS API + статус -->
+        <Grid Grid.Row="1" ColumnDefinitions="100,260,Auto" Margin="0,0,0,10">
+          <TextBlock Grid.Column="0" Text="FNS API Key:" VerticalAlignment="Center" />
+          <TextBox Grid.Column="1"
+                   Height="28"
+                   Text="{Binding FnsApiKey, Mode=TwoWay}"
+                   Watermark="Ключ доступа к API ФНС/провайдера"
+                   Margin="8,0,0,0" />
+          <StackPanel Grid.Column="2" Orientation="Horizontal"
+                      Spacing="8" VerticalAlignment="Center" Margin="8,0,0,0">
+            <Button Content="Проверить по ФНС"
+                    Command="{Binding CheckWithFnsCommand}"
+                    IsEnabled="{Binding SelectedCounterparty}" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="#2e7d32"
+                       VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+
+        <!-- список + форма -->
+        <Grid Grid.Row="2" ColumnDefinitions="2*,*" >
+          <dg:DataGrid Grid.Column="0"
+                       ItemsSource="{Binding Counterparties}"
+                       SelectedItem="{Binding SelectedCounterparty, Mode=TwoWay}"
+                       AutoGenerateColumns="False"
+                       IsReadOnly="True"
+                       Margin="0,0,8,0">
+            <dg:DataGrid.Columns>
+              <dg:DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="2*" />
+              <dg:DataGridTextColumn Header="ИНН"          Binding="{Binding INN}"  Width="*" />
+              <dg:DataGridTextColumn Header="ОГРН"         Binding="{Binding OGRN}" Width="*" />
+              <dg:DataGridTextColumn Header="Статус"       Binding="{Binding Status}" Width="*" />
+              <dg:DataGridTextColumn Header="Уровень риска" Binding="{Binding RiskLevel}" Width="*" />
+            </dg:DataGrid.Columns>
+          </dg:DataGrid>
+
+          <ScrollViewer Grid.Column="1">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Карточка контрагента"
+                         FontWeight="SemiBold"
+                         FontSize="14"
+                         Margin="0,0,0,4" />
+
+              <TextBlock Text="Краткое наименование" />
+              <TextBox Text="{Binding SelectedCounterparty.Name, Mode=TwoWay}" />
+
+              <TextBlock Text="Полное наименование" />
+              <TextBox Text="{Binding SelectedCounterparty.FullName, Mode=TwoWay}" />
+
+              <TextBlock Text="ИНН" />
+              <TextBox Text="{Binding SelectedCounterparty.INN, Mode=TwoWay}" />
+
+              <TextBlock Text="КПП" />
+              <TextBox Text="{Binding SelectedCounterparty.KPP, Mode=TwoWay}" />
+
+              <TextBlock Text="ОГРН" />
+              <TextBox Text="{Binding SelectedCounterparty.OGRN, Mode=TwoWay}" />
+
+              <TextBlock Text="Юридический адрес" />
+              <TextBox Text="{Binding SelectedCounterparty.LegalAddress, Mode=TwoWay}" />
+
+              <TextBlock Text="Фактический адрес" />
+              <TextBox Text="{Binding SelectedCounterparty.ActualAddress, Mode=TwoWay}" />
+
+              <TextBlock Text="Телефон" />
+              <TextBox Text="{Binding SelectedCounterparty.Phone, Mode=TwoWay}" />
+
+              <TextBlock Text="E-mail" />
+              <TextBox Text="{Binding SelectedCounterparty.Email, Mode=TwoWay}" />
+
+              <TextBlock Text="Директор" />
+              <TextBox Text="{Binding SelectedCounterparty.DirectorName, Mode=TwoWay}" />
+
+              <TextBlock Text="Статус" />
+              <TextBox Text="{Binding SelectedCounterparty.Status, Mode=TwoWay}" />
+
+              <TextBlock Text="Уровень риска" />
+              <TextBox Text="{Binding SelectedCounterparty.RiskLevel, Mode=TwoWay}" />
+
+              <TextBlock Text="Заметки" />
+              <TextBox Text="{Binding SelectedCounterparty.Notes, Mode=TwoWay}"
+                       AcceptsReturn="True" Height="80" />
+
+              <Separator Margin="0,8,0,4" />
+
+              <TextBlock Text="Результаты проверки ФНС"
+                         FontWeight="SemiBold"
+                         FontSize="14" />
+
+              <StackPanel>
+                <TextBlock Text="{Binding LastAuditHistory.Source}"   FontStyle="Italic" />
+                <TextBlock Text="{Binding LastAuditHistory.CheckDate}" FontSize="11" />
+                <TextBlock Text="{Binding LastAuditHistory.RiskLevel}" FontSize="11" />
+                <TextBlock Text="{Binding LastAuditHistory.Findings}"
+                           FontSize="11" TextWrapping="Wrap" />
+              </StackPanel>
             </StackPanel>
-        </Border>
+          </ScrollViewer>
+        </Grid>
+      </Grid>
+    </DataTemplate>
 
-        <Border Grid.Column="1" Background="White" Margin="10">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="{Binding WelcomeMessage}" 
-                           FontSize="20" 
-                           Foreground="#2e7d32"
-                           FontWeight="SemiBold"/>
-                <TextBlock Text="Выберите раздел в меню слева для начала работы" 
-                           FontSize="14" 
-                           Foreground="#666"
-                           Margin="0,10,0,0"/>
+    <!-- Документы -->
+    <DataTemplate x:DataType="vm:DocumentViewModel">
+      <Grid RowDefinitions="Auto,*" Margin="12">
+        <Grid ColumnDefinitions="260,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,10">
+          <TextBox Grid.Column="0"
+                   Height="30"
+                   Watermark="Поиск по названию, номеру, тегам"
+                   Text="{Binding SearchText, Mode=TwoWay}" />
+          <Button Grid.Column="1" Content="Найти"
+                  Command="{Binding SearchCommand}" MinWidth="80" Margin="8,0,0,0" />
+          <Button Grid.Column="2" Content="Добавить"
+                  Command="{Binding AddNewCommand}" MinWidth="90" Margin="8,0,0,0" />
+          <Button Grid.Column="3" Content="Сохранить"
+                  Command="{Binding SaveCommand}" MinWidth="100"
+                  IsEnabled="{Binding SelectedDocument}" Margin="8,0,0,0" />
+          <Button Grid.Column="4" Content="Удалить"
+                  Command="{Binding DeleteCommand}" MinWidth="90"
+                  IsEnabled="{Binding SelectedDocument}" Margin="8,0,0,0" />
+          <Button Grid.Column="5" Content="Отчёт (PDF)"
+                  Command="{Binding ExportReportCommand}" MinWidth="110" Margin="8,0,0,0" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="2*,*">
+          <dg:DataGrid Grid.Column="0"
+                       ItemsSource="{Binding Documents}"
+                       SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
+                       AutoGenerateColumns="False"
+                       IsReadOnly="True"
+                       Margin="0,0,8,0">
+            <dg:DataGrid.Columns>
+              <dg:DataGridTextColumn Header="Название" Binding="{Binding Title}"          Width="2*" />
+              <dg:DataGridTextColumn Header="Номер"    Binding="{Binding DocumentNumber}" Width="*" />
+              <dg:DataGridTextColumn Header="Тип"      Binding="{Binding DocumentType}"   Width="*" />
+              <dg:DataGridTextColumn Header="Статус"   Binding="{Binding Status}"         Width="*" />
+              <dg:DataGridTextColumn Header="Дата"     Binding="{Binding DocumentDate}"   Width="*" />
+            </dg:DataGrid.Columns>
+          </dg:DataGrid>
+
+          <ScrollViewer Grid.Column="1">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Карточка документа"
+                         FontWeight="SemiBold"
+                         FontSize="14"
+                         Margin="0,0,0,4" />
+
+              <TextBlock Text="Название" />
+              <TextBox Text="{Binding SelectedDocument.Title, Mode=TwoWay}" />
+
+              <TextBlock Text="Номер" />
+              <TextBox Text="{Binding SelectedDocument.DocumentNumber, Mode=TwoWay}" />
+
+              <TextBlock Text="Тип" />
+              <TextBox Text="{Binding SelectedDocument.DocumentType, Mode=TwoWay}" />
+
+              <TextBlock Text="Статус" />
+              <TextBox Text="{Binding SelectedDocument.Status, Mode=TwoWay}" />
+
+              <TextBlock Text="Дата документа" />
+              <DatePicker SelectedDate="{Binding SelectedDocument.DocumentDate, Mode=TwoWay}" />
+
+              <TextBlock Text="Сумма" />
+              <TextBox Text="{Binding SelectedDocument.Amount, Mode=TwoWay}" />
+
+              <TextBlock Text="Валюта" />
+              <TextBox Text="{Binding SelectedDocument.Currency, Mode=TwoWay}" />
+
+              <TextBlock Text="Теги" />
+              <TextBox Text="{Binding SelectedDocument.Tags, Mode=TwoWay}" />
+
+              <TextBlock Text="Конфиденциальный" />
+              <CheckBox IsChecked="{Binding SelectedDocument.IsConfidential, Mode=TwoWay}" />
+
+              <TextBlock Text="Содержимое (кратко)" />
+              <TextBox Text="{Binding SelectedDocument.Content, Mode=TwoWay}"
+                       AcceptsReturn="True" Height="80" />
             </StackPanel>
-        </Border>
-    </Grid>
+          </ScrollViewer>
+        </Grid>
+      </Grid>
+    </DataTemplate>
+
+    <!-- События -->
+    <DataTemplate x:DataType="vm:EventsViewModel">
+      <Grid RowDefinitions="Auto,*" Margin="12">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+          <TextBlock Text="Срок до:" VerticalAlignment="Center" />
+          <DatePicker SelectedDate="{Binding UntilDate, Mode=TwoWay}" />
+          <Button Content="Обновить" Command="{Binding RefreshCommand}" />
+        </StackPanel>
+
+        <dg:DataGrid Grid.Row="1"
+                     ItemsSource="{Binding UpcomingEvents}"
+                     AutoGenerateColumns="False"
+                     IsReadOnly="True">
+          <dg:DataGrid.Columns>
+            <dg:DataGridTextColumn Header="Документ" Binding="{Binding Document.Title}" Width="2*" />
+            <dg:DataGridTextColumn Header="Событие"  Binding="{Binding Title}"          Width="2*" />
+            <dg:DataGridTextColumn Header="Тип"      Binding="{Binding EventType}"      Width="*" />
+            <dg:DataGridTextColumn Header="Срок"     Binding="{Binding DueDate}"        Width="*" />
+            <dg:DataGridTextColumn Header="Статус"   Binding="{Binding Status}"         Width="*" />
+          </dg:DataGrid.Columns>
+        </dg:DataGrid>
+      </Grid>
+    </DataTemplate>
+
+  </Window.DataTemplates>
+
+  <!-- общий каркас: левый сайдбар + правая область -->
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="260" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- левый сайдбар -->
+    <Border Grid.Column="0" Classes="sidebar">
+      <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <!-- аккаунт -->
+        <StackPanel Grid.Row="0" Margin="20,24,20,16" Spacing="4">
+          <TextBlock Text="Аккаунт" FontSize="11" Foreground="#888" />
+          <TextBlock Text="{Binding CurrentUserName}"
+                     FontSize="15"
+                     FontWeight="SemiBold"
+                     Foreground="#222" />
+        </StackPanel>
+
+        <!-- меню (без Главная) -->
+        <StackPanel Grid.Row="1" Spacing="2">
+          <Button Content="Контрагенты"
+                  Classes="menu"
+                  Command="{Binding ShowCounterpartiesCommand}" />
+          <Button Content="Документы"
+                  Classes="menu"
+                  Command="{Binding ShowDocumentsCommand}" />
+          <Button Content="События"
+                  Classes="menu"
+                  Command="{Binding ShowEventsCommand}" />
+        </StackPanel>
+
+        <!-- настройки над выходом (позже добавишь команду ShowSettingsCommand) -->
+        <Button Grid.Row="2"
+                Content="Настройки"
+                Classes="menu"
+                HorizontalAlignment="Stretch" />
+
+        <!-- выход в самом низу -->
+        <Button Grid.Row="3"
+                Content="Выход"
+                Classes="logout"
+                Command="{Binding LogoutCommand}" />
+      </Grid>
+    </Border>
+
+    <!-- правая часть -->
+    <Border Grid.Column="1"
+            Background="White"
+            Margin="8"
+            CornerRadius="4">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock Grid.Row="0"
+                   Text="Legal Assistant"
+                   FontSize="11"
+                   Foreground="#999"
+                   HorizontalAlignment="Right"
+                   Margin="0,6,10,0" />
+        <ContentControl Grid.Row="1"
+                        Content="{Binding CurrentContent}" />
+      </Grid>
+    </Border>
+  </Grid>
 </Window>

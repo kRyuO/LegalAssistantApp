@@ -1,12 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
-namespace LegalAssistantApp.Helpers
+namespace LegalAssistantApp.Helpers;
+
+public static class FileHelper
 {
-    internal class FileHelper
+    public static string GetDocumentsRootFolder()
     {
+        var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var root = Path.Combine(documents, "LegalAssistant");
+        if (!Directory.Exists(root))
+        {
+            Directory.CreateDirectory(root);
+        }
+
+        return root;
+    }
+
+    public static string CombinePath(params string[] parts)
+    {
+        return Path.Combine(parts);
     }
 }

@@ -1,46 +1,95 @@
-<Window xmlns="https://github.com/avaloniaui"
+ï»¿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LegalAssistantApp.ViewModels;assembly=LegalAssistantApp"
         x:Class="LegalAssistantApp.Views.LoginWindow"
         x:DataType="vm:AuthViewModel"
-        Title="Àóòåíòèôèêàöèÿ"
-        Width="500"
-        Height="500"
+        Title="Ð’Ñ…Ð¾Ð´ Ð² ÑÐ¸ÑÑ‚ÐµÐ¼Ñƒ"
+        Width="480"
+        Height="420"
         WindowStartupLocation="CenterScreen"
         CanResize="False"
         FontFamily="Segoe UI">
-    
-    <StackPanel Margin="40" Spacing="20" Background="#f8f9fa">
-        <TextBlock Text="Äîáðî ïîæàëîâàòü â ñèñòåìó" 
-                   FontSize="24" 
-                   Foreground="#2e7d32"
-                   FontWeight="Bold"
-                   HorizontalAlignment="Center"/>
-        
-        <TextBlock Text="Àóòåíòèôèêàöèÿ" 
-                   FontSize="18" 
-                   Foreground="#4caf50"
-                   HorizontalAlignment="Center"/>
-        
-        <StackPanel Spacing="10">
-            <TextBlock Text="Ëîãèí" FontWeight="SemiBold" Foreground="#555"/>
-            <TextBox Text="{Binding Username}"/>
-            
-            <TextBlock Text="Ïàðîëü" FontWeight="SemiBold" Foreground="#555"/>
-            <TextBox Text="{Binding Password}" PasswordChar="*"/>
-            
-            <TextBlock Text="{Binding ErrorMessage}"
-                       Foreground="#d32f2f" 
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center"
-                       Margin="0,10,0,0"/>
-            
-            <Button Content="Âõîä" 
-                    Command="{Binding LoginCommand}"
-                    Background="#4caf50"
-                    Foreground="White"
-                    Padding="20,10"
-                    Margin="0,20,0,0"/>
+
+  <Window.Styles>
+    <Style Selector="Button.login">
+      <Setter Property="Background" Value="#2e7d32" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#2e7d32" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="Button.login:pointerover">
+      <Setter Property="Background" Value="#27642a" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#27642a" />
+    </Style>
+  </Window.Styles>
+
+  <Grid Background="#e5e9f0">
+    <Border Width="380"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="White"
+            CornerRadius="12"
+            Padding="24">
+      <StackPanel Spacing="18">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Ð”Ð¾Ð±Ñ€Ð¾ Ð¿Ð¾Ð¶Ð°Ð»Ð¾Ð²Ð°Ñ‚ÑŒ!"
+                     FontSize="22"
+                     FontWeight="Bold"
+                     Foreground="#2e7d32"
+                     HorizontalAlignment="Center" />
+          <TextBlock Text="ÐÑƒÑ‚ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ"
+                     FontSize="14"
+                     Foreground="#666"
+                     HorizontalAlignment="Center" />
         </StackPanel>
-    </StackPanel>
+
+        <StackPanel Spacing="6">
+          <TextBlock Text="Ð›Ð¾Ð³Ð¸Ð½"
+                     FontWeight="SemiBold"
+                     Foreground="#444" />
+          <TextBox Text="{Binding Username}"
+                   Watermark="Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð»Ð¾Ð³Ð¸Ð½"
+                   Height="32" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+          <TextBlock Text="ÐŸÐ°Ñ€Ð¾Ð»ÑŒ"
+                     FontWeight="SemiBold"
+                     Foreground="#444" />
+          <TextBox Text="{Binding Password}"
+                   PasswordChar="â—"
+                   Watermark="Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¿Ð°Ñ€Ð¾Ð»ÑŒ"
+                   Height="32" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding ErrorMessage}"
+                   Foreground="#d32f2f"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center"
+                   TextWrapping="Wrap"
+                   MinHeight="20" />
+
+        <Button Content="Ð’Ð¾Ð¹Ñ‚Ð¸"
+                Classes="login"
+                Command="{Binding LoginCommand}"
+                FontWeight="SemiBold"
+                FontSize="15"
+                Width="180"
+                Height="40"
+                HorizontalAlignment="Center"
+                Margin="0,12,0,0" />
+
+        <TextBlock Text="Ð¢ÐµÑÑ‚Ð¾Ð²Ñ‹Ð¹ Ð´Ð¾ÑÑ‚ÑƒÐ¿: admin / admin123"
+                   FontSize="11"
+                   Foreground="#888"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" />
+      </StackPanel>
+    </Border>
+  </Grid>
 </Window>

@@ -40,7 +40,7 @@ public partial class AuthViewModel : ObservableObject
             ErrorMessage = "";
 
             // Переход на главное окно
-            var mainWindow = new MainWindow();
+            var mainWindow = new MainWindow(user);
             mainWindow.Show();
 
             // Закрытие текущего окна входа
