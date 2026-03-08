@@ -13,11 +13,23 @@ namespace LegalAssistantApp.Services;
 
 public class CounterpartyService
 {
+    private readonly AppDbContext _context;
+
+    // Конструктор с контекстом
+    public CounterpartyService(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // Конструктор без параметров (для DI)
+    public CounterpartyService()
+    {
+        _context = new AppDbContext();
+    }
+
     public async Task<List<Counterparty>> GetCounterpartiesAsync(string? search = null)
     {
-        await using var context = new AppDbContext();
-
-        IQueryable<Counterparty> query = context.Counterparties;
+        IQueryable<Counterparty> query = _context.Counterparties;
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -33,42 +45,53 @@ public class CounterpartyService
             .ToListAsync();
     }
 
+    public async Task<List<Counterparty>> GetAllCounterpartiesAsync()
+    {
+        return await GetCounterpartiesAsync();
+    }
+
+    public async Task<List<Counterparty>> SearchCounterpartiesAsync(string search)
+    {
+        return await GetCounterpartiesAsync(search);
+    }
+
     public async Task SaveCounterpartyAsync(Counterparty counterparty)
     {
-        await using var context = new AppDbContext();
-
         if (counterparty.Id == 0)
         {
             counterparty.CreatedDate = DateTime.UtcNow;
             counterparty.UpdatedDate = DateTime.UtcNow;
-            context.Counterparties.Add(counterparty);
+            _context.Counterparties.Add(counterparty);
         }
         else
         {
             counterparty.UpdatedDate = DateTime.UtcNow;
-            context.Counterparties.Update(counterparty);
+            _context.Counterparties.Update(counterparty);
         }
 
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task CreateCounterpartyAsync(Counterparty counterparty)
+    {
+        await SaveCounterpartyAsync(counterparty);
+    }
+
+    public async Task UpdateCounterpartyAsync(Counterparty counterparty)
+    {
+        await SaveCounterpartyAsync(counterparty);
     }
 
     public async Task DeleteCounterpartyAsync(int id)
     {
-        await using var context = new AppDbContext();
-        var entity = await context.Counterparties.FirstOrDefaultAsync(c => c.Id == id);
+        var entity = await _context.Counterparties.FirstOrDefaultAsync(c => c.Id == id);
         if (entity != null)
         {
-            context.Counterparties.Remove(entity);
-            await context.SaveChangesAsync();
+            _context.Counterparties.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 
-    /// <summary>
-    /// Проверка контрагента по ИНН через внешний API (например, api-fns.ru или другой провайдер данных ФНС).
-    /// </summary>
-    /// <param name="counterpartyId">ID контрагента в локной базе</param>
-    /// <param name="inn">ИНН контрагента</param>
-    /// <param name="apiKey">Ключ доступа к API провайдера ФНС</param>
     public async Task<AuditHistory?> CheckWithFnsAsync(int counterpartyId, string inn, string apiKey, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(inn) || string.IsNullOrWhiteSpace(apiKey))
@@ -76,7 +99,6 @@ public class CounterpartyService
             return null;
         }
 
-        // Пример для сервиса api-fns.ru: https://api-fns.ru/api/egr?req={inn}&key={apiKey}
         var requestUri = $"https://api-fns.ru/api/egr?req={inn}&key={apiKey}";
 
         using var http = new HttpClient();
@@ -105,7 +127,6 @@ public class CounterpartyService
 
         var reportData = JObject.FromObject(summary).ToString();
 
-        await using var context = new AppDbContext();
         var history = new AuditHistory
         {
             CounterpartyId = counterpartyId,
@@ -118,16 +139,15 @@ public class CounterpartyService
             CheckDate = DateTime.UtcNow
         };
 
-        context.AuditHistories.Add(history);
-        await context.SaveChangesAsync(cancellationToken);
+        _context.AuditHistories.Add(history);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return history;
     }
 
     public async Task<AuditHistory?> GetLastAuditHistoryAsync(int counterpartyId)
     {
-        await using var context = new AppDbContext();
-        return await context.AuditHistories
+        return await _context.AuditHistories
             .Where(a => a.CounterpartyId == counterpartyId)
             .OrderByDescending(a => a.CheckDate)
             .FirstOrDefaultAsync();

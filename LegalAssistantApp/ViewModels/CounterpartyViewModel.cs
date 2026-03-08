@@ -5,13 +5,14 @@ using LegalAssistantApp.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace LegalAssistantApp.ViewModels;
 
 public partial class CounterpartyViewModel : ObservableObject
 {
     private readonly CounterpartyService _service;
+    private Counterparty? _selectedCounterparty;
+    private AuditHistory? _lastAuditHistory;
 
     public CounterpartyViewModel(CounterpartyService service)
     {
@@ -19,120 +20,248 @@ public partial class CounterpartyViewModel : ObservableObject
         Counterparties = new ObservableCollection<Counterparty>();
     }
 
-    public ObservableCollection<Counterparty> Counterparties { get; }
-
     [ObservableProperty]
-    private Counterparty? _selectedCounterparty;
+    private ObservableCollection<Counterparty> _counterparties;
 
     [ObservableProperty]
     private string _searchText = string.Empty;
 
     [ObservableProperty]
-    private string _fnsApiKey = string.Empty;
-
-    [ObservableProperty]
     private string _statusMessage = string.Empty;
 
     [ObservableProperty]
-    private AuditHistory? _lastAuditHistory;
+    private string _fnsApiKey = string.Empty;
 
-    public async Task LoadCounterpartiesAsync()
+    public Counterparty? SelectedCounterparty
     {
-        Counterparties.Clear();
-        var items = await _service.GetCounterpartiesAsync();
-        foreach (var c in items)
+        get => _selectedCounterparty;
+        set
         {
-            Counterparties.Add(c);
+            if (SetProperty(ref _selectedCounterparty, value) && value != null)
+            {
+                _ = LoadLastAuditHistoryAsync();
+            }
         }
     }
 
-    private async Task LoadLastAuditAsync()
+    public AuditHistory? LastAuditHistory
     {
-        if (SelectedCounterparty == null || SelectedCounterparty.Id == 0)
-        {
-            LastAuditHistory = null;
-            return;
-        }
+        get => _lastAuditHistory;
+        set => SetProperty(ref _lastAuditHistory, value);
+    }
 
-        LastAuditHistory = await _service.GetLastAuditHistoryAsync(SelectedCounterparty.Id);
+    // Вычисляемое свойство для цвета статуса
+    public string StatusColor
+    {
+        get
+        {
+            if (SelectedCounterparty == null)
+                return "Gray";
+
+            // Логика определения цвета
+            return SelectedCounterparty.RiskLevel switch
+            {
+                "Low" => "Green",
+                "Medium" => "Orange",
+                "High" => "Red",
+                _ => "Gray"
+            };
+        }
+    }
+
+    // Свойства для удобства привязки в XAML
+    public string LastCheckDate => LastAuditHistory?.CheckDate.ToString("dd.MM.yyyy HH:mm") ?? "Не проверялся";
+    public string LastCheckSource => LastAuditHistory?.Source ?? "Нет данных";
+    public string LastCheckResult => LastAuditHistory?.RiskLevel ?? "Неизвестно";
+    public bool HasProblems => LastAuditHistory?.HasProblems ?? false;
+
+    // Публичный метод для загрузки контрагентов
+    [RelayCommand]
+    public async Task LoadCounterpartiesAsync()
+    {
+        try
+        {
+            var counterparties = await _service.GetAllCounterpartiesAsync();
+            Counterparties.Clear();
+            foreach (var cp in counterparties)
+            {
+                Counterparties.Add(cp);
+            }
+            StatusMessage = $"Загружено {Counterparties.Count} контрагентов";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка загрузки: {ex.Message}";
+        }
     }
 
     [RelayCommand]
-    private async Task Search()
+    private async Task SearchAsync()
     {
-        Counterparties.Clear();
-        var items = await _service.GetCounterpartiesAsync(SearchText);
-        foreach (var c in items)
+        try
         {
-            Counterparties.Add(c);
+            var counterparties = await _service.SearchCounterpartiesAsync(SearchText);
+            Counterparties.Clear();
+            foreach (var cp in counterparties)
+            {
+                Counterparties.Add(cp);
+            }
+            StatusMessage = $"Найдено {Counterparties.Count} контрагентов";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка поиска: {ex.Message}";
         }
     }
 
     [RelayCommand]
     private void AddNew()
     {
-        var counterparty = new Counterparty
+        var newCounterparty = new Counterparty
         {
             Name = "Новый контрагент",
             Status = "Active",
-            RiskLevel = "Unknown",
+            RiskLevel = "Medium",
             CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow,
-            CreatedByUserId = 1 // временно: администратор по умолчанию
+            UpdatedDate = DateTime.UtcNow
         };
-        Counterparties.Add(counterparty);
-        SelectedCounterparty = counterparty;
+        Counterparties.Add(newCounterparty);
+        SelectedCounterparty = newCounterparty;
+        StatusMessage = "Создан новый контрагент";
     }
 
     [RelayCommand]
-    private async Task Save()
+    private async Task SaveAsync()
+    {
+        if (SelectedCounterparty == null) return;
+
+        try
+        {
+            if (SelectedCounterparty.Id == 0)
+            {
+                await _service.CreateCounterpartyAsync(SelectedCounterparty);
+                StatusMessage = "Контрагент создан";
+            }
+            else
+            {
+                await _service.UpdateCounterpartyAsync(SelectedCounterparty);
+                StatusMessage = "Контрагент сохранен";
+            }
+            await LoadCounterpartiesAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка сохранения: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAsync()
+    {
+        if (SelectedCounterparty == null || SelectedCounterparty.Id == 0) return;
+
+        try
+        {
+            await _service.DeleteCounterpartyAsync(SelectedCounterparty.Id);
+            Counterparties.Remove(SelectedCounterparty);
+            SelectedCounterparty = null;
+            LastAuditHistory = null;
+            StatusMessage = "Контрагент удален";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка удаления: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task CheckWithFnsAsync()
     {
         if (SelectedCounterparty == null)
+        {
+            StatusMessage = "Выберите контрагента";
             return;
+        }
 
-        SelectedCounterparty.UpdatedDate = DateTime.UtcNow;
-        await _service.SaveCounterpartyAsync(SelectedCounterparty);
-        await LoadCounterpartiesAsync();
-        await LoadLastAuditAsync();
+        if (string.IsNullOrEmpty(FnsApiKey))
+        {
+            StatusMessage = "Введите ключ API ФНС";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(SelectedCounterparty.INN))
+        {
+            StatusMessage = "У контрагента не указан ИНН";
+            return;
+        }
+
+        StatusMessage = "Проверка через ФНС...";
+
+        try
+        {
+            var history = await _service.CheckWithFnsAsync(
+                SelectedCounterparty.Id,
+                SelectedCounterparty.INN,
+                FnsApiKey);
+
+            if (history != null)
+            {
+                LastAuditHistory = history;
+                StatusMessage = "Проверка через ФНС выполнена успешно";
+                OnPropertyChanged(nameof(LastCheckDate));
+                OnPropertyChanged(nameof(LastCheckSource));
+                OnPropertyChanged(nameof(LastCheckResult));
+                OnPropertyChanged(nameof(HasProblems));
+                OnPropertyChanged(nameof(StatusColor));
+            }
+            else
+            {
+                StatusMessage = "Не удалось получить данные из ФНС";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка при проверке: {ex.Message}";
+        }
     }
 
     [RelayCommand]
-    private async Task Delete()
+    private async Task RefreshAsync()
     {
-        if (SelectedCounterparty == null || SelectedCounterparty.Id == 0)
-            return;
-
-        await _service.DeleteCounterpartyAsync(SelectedCounterparty.Id);
         await LoadCounterpartiesAsync();
-        LastAuditHistory = null;
     }
 
-    [RelayCommand]
-    private async Task CheckWithFns()
+    private async Task LoadLastAuditHistoryAsync()
     {
-        if (SelectedCounterparty == null || string.IsNullOrWhiteSpace(SelectedCounterparty.INN))
+        if (SelectedCounterparty == null)
         {
-            StatusMessage = "Выберите контрагента с заполненным ИНН.";
+            LastAuditHistory = null;
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(FnsApiKey))
+        try
         {
-            StatusMessage = "Укажите ключ API ФНС/провайдера (FNS API Key).";
-            return;
+            LastAuditHistory = await _service.GetLastAuditHistoryAsync(SelectedCounterparty.Id);
+            OnPropertyChanged(nameof(LastCheckDate));
+            OnPropertyChanged(nameof(LastCheckSource));
+            OnPropertyChanged(nameof(LastCheckResult));
+            OnPropertyChanged(nameof(HasProblems));
+            OnPropertyChanged(nameof(StatusColor));
         }
-
-        StatusMessage = "Запрос к API ФНС...";
-
-        var history = await _service.CheckWithFnsAsync(SelectedCounterparty.Id, SelectedCounterparty.INN, FnsApiKey, CancellationToken.None);
-
-        if (history != null)
+        catch (Exception ex)
         {
-            LastAuditHistory = history;
+            Console.WriteLine($"Ошибка при загрузке истории аудита: {ex.Message}");
+            LastAuditHistory = null;
         }
+    }
 
-        StatusMessage = history != null
-            ? "Данные ФНС получены и сохранены в истории проверок."
-            : "Не удалось получить данные от API ФНС.";
+    // Метод для обновления статуса после изменения данных
+    public void UpdateStatus()
+    {
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(LastCheckDate));
+        OnPropertyChanged(nameof(LastCheckSource));
+        OnPropertyChanged(nameof(LastCheckResult));
+        OnPropertyChanged(nameof(HasProblems));
     }
 }

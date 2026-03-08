@@ -1,32 +1,76 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
-namespace LegalAssistantApp.Models;
-
-public class Counterparty
+namespace LegalAssistantApp.Models
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string FullName { get; set; } = string.Empty;
-    public string INN { get; set; } = string.Empty;
-    public string KPP { get; set; } = string.Empty;
-    public string OGRN { get; set; } = string.Empty;
-    public string LegalAddress { get; set; } = string.Empty;
-    public string ActualAddress { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string DirectorName { get; set; } = string.Empty;
-    public string Status { get; set; } = "Active";
-    public string RiskLevel { get; set; } = "Unknown";
-    public string Notes { get; set; } = string.Empty;
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
-    public int CreatedByUserId { get; set; }
+    public class Counterparty
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public List<Document> Documents { get; set; } = new();
-    public List<AuditHistory> AuditHistories { get; set; } = new();
-    public User CreatedByUser { get; set; } = null!;
+        /// <summary>
+        /// Тип контрагента: Юр.лицо / Физ.лицо
+        /// </summary>
+        [MaxLength(20)]
+        public string Type { get; set; } = "Юр.лицо";
+
+        [Required]
+        [MaxLength(200)]
+        public string Name { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string FullName { get; set; } = string.Empty;
+
+        [MaxLength(12)]
+        public string INN { get; set; } = string.Empty;
+
+        [MaxLength(9)]
+        public string KPP { get; set; } = string.Empty;
+
+        [MaxLength(15)]
+        public string OGRN { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string LegalAddress { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string ActualAddress { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string Phone { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Основное контактное лицо
+        /// </summary>
+        [MaxLength(100)]
+        public string ContactPerson { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string Email { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string DirectorName { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string Status { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string RiskLevel { get; set; } = string.Empty;
+
+        [MaxLength(2000)]
+        public string Notes { get; set; } = string.Empty;
+
+        // Связи
+        public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
+
+        // История аудита
+        public virtual ICollection<AuditHistory> AuditHistories { get; set; } = new List<AuditHistory>();
+
+        // Системные поля
+        public int CreatedByUserId { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedDate { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
 }

@@ -10,11 +10,23 @@ namespace LegalAssistantApp.Services;
 
 public class DocumentService
 {
+    private readonly AppDbContext _context;
+
+    // Конструктор с контекстом
+    public DocumentService(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // Конструктор без параметров (для DI)
+    public DocumentService()
+    {
+        _context = new AppDbContext();
+    }
+
     public async Task<List<Document>> GetDocumentsAsync(string? search = null)
     {
-        await using var context = new AppDbContext();
-
-        IQueryable<Document> query = context.Documents;
+        IQueryable<Document> query = _context.Documents;
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -25,46 +37,64 @@ public class DocumentService
         }
 
         return await query
-            .OrderByDescending(d => d.DocumentDate)
+            .OrderByDescending(d => d.DocumentDate ?? DateTime.MinValue)
+            .ThenByDescending(d => d.CreatedDate)
             .AsNoTracking()
             .ToListAsync();
     }
 
+    public async Task<List<Document>> GetAllDocumentsAsync()
+    {
+        return await GetDocumentsAsync();
+    }
+
+    public async Task<List<Document>> SearchDocumentsAsync(string search)
+    {
+        return await GetDocumentsAsync(search);
+    }
+
     public async Task SaveDocumentAsync(Document document)
     {
-        await using var context = new AppDbContext();
-
         if (document.Id == 0)
         {
             document.CreatedDate = DateTime.UtcNow;
             document.UpdatedDate = DateTime.UtcNow;
-            context.Documents.Add(document);
+            _context.Documents.Add(document);
         }
         else
         {
             document.UpdatedDate = DateTime.UtcNow;
-            context.Documents.Update(document);
+            _context.Documents.Update(document);
         }
 
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task CreateDocumentAsync(Document document)
+    {
+        await SaveDocumentAsync(document);
+    }
+
+    public async Task UpdateDocumentAsync(Document document)
+    {
+        await SaveDocumentAsync(document);
     }
 
     public async Task DeleteDocumentAsync(int id)
     {
-        await using var context = new AppDbContext();
-        var entity = await context.Documents.FirstOrDefaultAsync(d => d.Id == id);
+        var entity = await _context.Documents.FirstOrDefaultAsync(d => d.Id == id);
         if (entity != null)
         {
-            context.Documents.Remove(entity);
-            await context.SaveChangesAsync();
+            _context.Documents.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
+
     public async Task<List<DocumentEvent>> GetUpcomingEventsAsync(DateTime? until = null)
     {
-        await using var context = new AppDbContext();
         var boundary = until ?? DateTime.UtcNow.AddDays(30);
 
-        return await context.DocumentEvents
+        return await _context.DocumentEvents
             .Include(e => e.Document)
             .Where(e => e.Status == "Pending" && e.DueDate <= boundary)
             .OrderBy(e => e.DueDate)
@@ -74,13 +104,12 @@ public class DocumentService
 
     public async Task MarkEventCompletedAsync(int eventId)
     {
-        await using var context = new AppDbContext();
-        var entity = await context.DocumentEvents.FirstOrDefaultAsync(e => e.Id == eventId);
+        var entity = await _context.DocumentEvents.FirstOrDefaultAsync(e => e.Id == eventId);
         if (entity != null)
         {
             entity.Status = "Completed";
             entity.CompletedDate = DateTime.UtcNow;
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

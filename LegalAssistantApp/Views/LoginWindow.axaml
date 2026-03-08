@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LegalAssistantApp.ViewModels;assembly=LegalAssistantApp"
         x:Class="LegalAssistantApp.Views.LoginWindow"
@@ -12,9 +12,9 @@
 
   <Window.Styles>
     <Style Selector="Button.login">
-      <Setter Property="Background" Value="#2e7d32" />
+      <Setter Property="Background" Value="{DynamicResource ThemePrimaryColor}" />
       <Setter Property="Foreground" Value="White" />
-      <Setter Property="BorderBrush" Value="#2e7d32" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -22,17 +22,17 @@
     </Style>
 
     <Style Selector="Button.login:pointerover">
-      <Setter Property="Background" Value="#27642a" />
+      <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}" />
       <Setter Property="Foreground" Value="White" />
-      <Setter Property="BorderBrush" Value="#27642a" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}" />
     </Style>
   </Window.Styles>
 
-  <Grid Background="#e5e9f0">
+  <Grid Background="{DynamicResource ThemeWindowBackground}">
     <Border Width="380"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Background="White"
+            Background="{DynamicResource ThemeCardBackground}"
             CornerRadius="12"
             Padding="24">
       <StackPanel Spacing="18">
@@ -40,18 +40,18 @@
           <TextBlock Text="Добро пожаловать!"
                      FontSize="22"
                      FontWeight="Bold"
-                     Foreground="#2e7d32"
+                     Foreground="{DynamicResource ThemePrimaryColor}"
                      HorizontalAlignment="Center" />
           <TextBlock Text="Аутентификация пользователя"
                      FontSize="14"
-                     Foreground="#666"
+                     Foreground="{DynamicResource ThemeTextSecondary}"
                      HorizontalAlignment="Center" />
         </StackPanel>
 
         <StackPanel Spacing="6">
           <TextBlock Text="Логин"
                      FontWeight="SemiBold"
-                     Foreground="#444" />
+                     Foreground="{DynamicResource ThemeTextPrimary}" />
           <TextBox Text="{Binding Username}"
                    Watermark="Введите логин"
                    Height="32" />
@@ -60,7 +60,7 @@
         <StackPanel Spacing="6">
           <TextBlock Text="Пароль"
                      FontWeight="SemiBold"
-                     Foreground="#444" />
+                     Foreground="{DynamicResource ThemeTextPrimary}" />
           <TextBox Text="{Binding Password}"
                    PasswordChar="●"
                    Watermark="Введите пароль"
@@ -74,6 +74,7 @@
                    TextWrapping="Wrap"
                    MinHeight="20" />
 
+        <!-- кнопка входа -->
         <Button Content="Войти"
                 Classes="login"
                 Command="{Binding LoginCommand}"
@@ -86,7 +87,7 @@
 
         <TextBlock Text="Тестовый доступ: admin / admin123"
                    FontSize="11"
-                   Foreground="#888"
+                   Foreground="{DynamicResource ThemeTextMuted}"
                    HorizontalAlignment="Center"
                    Margin="0,4,0,0" />
       </StackPanel>

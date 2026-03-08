@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LegalAssistantApp.Services;
@@ -20,6 +20,11 @@ public partial class AuthViewModel : ObservableObject
     [ObservableProperty]
     private string _errorMessage = "";
 
+    public AuthViewModel()
+    {
+        _authService = new AuthService();
+    }
+
     public AuthViewModel(AuthService authService)
     {
         _authService = authService;
@@ -39,26 +44,59 @@ public partial class AuthViewModel : ObservableObject
         {
             ErrorMessage = "";
 
-            // Переход на главное окно
-            var mainWindow = new MainWindow(user);
+            var mainWindow = CreateMainWindow(user);
             mainWindow.Show();
 
-            // Закрытие текущего окна входа
-            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                foreach (var window in desktop.Windows)
-                {
-                    if (window is LoginWindow)
-                    {
-                        window.Close();
-                        break;
-                    }
-                }
-            }
+            CloseLoginWindow();
         }
         else
         {
             ErrorMessage = "Неверный логин или пароль";
+        }
+    }
+
+    [RelayCommand]
+    private void UseTestCredentials()
+    {
+        Username = "admin";
+        Password = "admin123";
+        ErrorMessage = "Тестовые данные заполнены. Нажмите 'Войти'";
+    }
+
+    private MainWindow CreateMainWindow(Models.User user)
+    {
+        var context = new Data.AppDbContext();
+        var counterpartyService = new CounterpartyService(context);
+        var documentService = new DocumentService(context);
+        var eventService = new EventService(context);
+
+        var mainWindowViewModel = new MainWindowViewModel(
+            counterpartyService,
+            documentService,
+            eventService,
+            user.FullName,
+            user.Id,
+            user.Role?.Name ?? string.Empty
+        );
+
+        return new MainWindow
+        {
+            DataContext = mainWindowViewModel
+        };
+    }
+
+    private void CloseLoginWindow()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            foreach (var window in desktop.Windows)
+            {
+                if (window is LoginWindow)
+                {
+                    window.Close();
+                    break;
+                }
+            }
         }
     }
 }

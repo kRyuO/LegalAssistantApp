@@ -1,16 +1,21 @@
-﻿using LegalAssistantApp.Data;
-using LegalAssistantApp.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using LegalAssistantApp.Data;
+using LegalAssistantApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LegalAssistantApp.Services;
 
 public class AuthService
 {
     private readonly AppDbContext _context;
+
+    public AuthService()
+    {
+        _context = new AppDbContext();
+    }
 
     public AuthService(AppDbContext context)
     {
@@ -19,67 +24,77 @@ public class AuthService
 
     public async Task<User?> AuthenticateAsync(string username, string password)
     {
-        try
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            return null;
+
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Username == username);
+
+        if (user == null)
+            return null;
+
+        if (!user.IsActive)
+            return null;
+
+        if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == username);
-
-            if (user == null)
-                return null;
-
-            if (VerifyPassword(password, user.PasswordHash, user.Salt))
-                return user;
-
             return null;
         }
-        catch (Exception ex)
+
+        var isValid = VerifyPassword(password, user.PasswordHash, user.Salt);
+        if (!isValid)
         {
-            Console.WriteLine($"Ошибка аутентификации: {ex.Message}");
-            return null;
-        }
-    }
+            user.FailedLoginAttempts++;
 
-    public string HashPassword(string password, string salt)
-    {
-        using var sha256 = SHA256.Create();
-        var saltedPassword = password + salt;
-        var bytes = Encoding.UTF8.GetBytes(saltedPassword);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
-    }
-
-    public string GenerateSalt()
-    {
-        var randomBytes = new byte[16];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomBytes);
-        return Convert.ToBase64String(randomBytes);
-    }
-
-    private bool VerifyPassword(string password, string storedHash, string salt)
-    {
-        var computedHash = HashPassword(password, salt);
-        return storedHash == computedHash;
-    }
-
-    public async Task CreateTestUserAsync()
-    {
-        if (!await _context.Users.AnyAsync(u => u.Username == "admin"))
-        {
-            var salt = GenerateSalt();
-            var user = new User
+            if (user.FailedLoginAttempts >= 5)
             {
-                Username = "admin",
-                Email = "admin@example.com",
-                PasswordHash = HashPassword("admin123", salt),
-                Salt = salt,
-                FirstName = "Admin",
-                LastName = "User",
-                IsActive = true
-            };
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                user.FailedLoginAttempts = 0;
+            }
 
-            _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            return null;
         }
+
+        user.FailedLoginAttempts = 0;
+        user.LockoutEnd = null;
+        user.LastLoginDate = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return user;
+    }
+
+    public (string Hash, string Salt) HashPassword(string password)
+    {
+        var saltBytes = RandomNumberGenerator.GetBytes(16);
+        var salt = Convert.ToBase64String(saltBytes);
+
+        var hash = HashWithSalt(password, salt);
+        return (hash, salt);
+    }
+
+    private static string HashWithSalt(string password, string salt)
+    {
+        var pbkdf2 = new Rfc2898DeriveBytes(
+            password,
+            Convert.FromBase64String(salt),
+            100_000,
+            HashAlgorithmName.SHA256);
+
+        var hashBytes = pbkdf2.GetBytes(32);
+        return Convert.ToBase64String(hashBytes);
+    }
+
+    private static bool VerifyPassword(string password, string storedHash, string storedSalt)
+    {
+        if (string.IsNullOrEmpty(storedHash) || string.IsNullOrEmpty(storedSalt))
+            return false;
+
+        var computedHash = HashWithSalt(password, storedSalt);
+        return CryptographicOperations.FixedTimeEquals(
+            Convert.FromBase64String(storedHash),
+            Convert.FromBase64String(computedHash));
     }
 }

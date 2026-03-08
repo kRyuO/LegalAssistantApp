@@ -1,36 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LegalAssistantApp.Models;
-
-public class Document
+namespace LegalAssistantApp.Models
 {
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string DocumentNumber { get; set; } = string.Empty;
-    public string DocumentType { get; set; } = string.Empty;
-    public string Status { get; set; } = "Draft";
-    public string Content { get; set; } = string.Empty;
-    public string FilePath { get; set; } = string.Empty;
-    public decimal? Amount { get; set; }
-    public string Currency { get; set; } = "RUB";
-    public DateTime DocumentDate { get; set; } = DateTime.UtcNow;
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public string Tags { get; set; } = string.Empty;
-    public bool IsConfidential { get; set; } = false;
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
-    public int CreatedByUserId { get; set; }
+    public class Document
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public int? CounterpartyId { get; set; }
-    public int? DocumentTemplateId { get; set; }
+        [Required]
+        [MaxLength(200)]
+        public string Title { get; set; } = "";
 
-    public Counterparty? Counterparty { get; set; }
-    public DocumentTemplate? DocumentTemplate { get; set; }
-    public User CreatedByUser { get; set; } = null!;
-    public List<DocumentEvent> DocumentEvents { get; set; } = new();
+        [MaxLength(100)]
+        public string DocumentNumber { get; set; } = "";
+
+        [Required]
+        [MaxLength(100)]
+        public string DocumentType { get; set; } = "";
+
+        [MaxLength(50)]
+        public string Status { get; set; } = "";
+
+        public DateTime? DocumentDate { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? Amount { get; set; }
+        public string Type { get; set; } = string.Empty;
+
+        [MaxLength(10)]
+        public string Currency { get; set; } = "RUB";
+
+        [MaxLength(500)]
+        public string Tags { get; set; } = "";
+
+        public bool IsConfidential { get; set; }
+
+        [MaxLength(2000)]
+        public string Content { get; set; } = "";
+
+        // Связи
+        public int? CounterpartyId { get; set; }
+        public virtual Counterparty? Counterparty { get; set; }
+
+        // Навигационное свойство для событий
+        public virtual ICollection<DocumentEvent> Events { get; set; } = new List<DocumentEvent>();
+
+        public int CreatedByUserId { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedDate { get; set; } // Добавлено
+
+        // Поля для файлов (опционально)
+        [MaxLength(500)]
+        public string FilePath { get; set; } = "";
+
+        [MaxLength(100)]
+        public string FileName { get; set; } = "";
+
+        public long? FileSize { get; set; }
+
+        public DateTime? FileCreatedDate { get; set; }
+
+        public DateTime? FileModifiedDate { get; set; }
+
+        [MaxLength(50)]
+        public string FileExtension { get; set; } = "";
+    }
 }

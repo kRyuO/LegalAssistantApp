@@ -1,368 +1,1358 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LegalAssistantApp.ViewModels;assembly=LegalAssistantApp"
         xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+        xmlns:converters="clr-namespace:LegalAssistantApp.Converters;assembly=LegalAssistantApp"
+        xmlns:loc="clr-namespace:LegalAssistantApp.Localization;assembly=LegalAssistantApp"
         x:Class="LegalAssistantApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Legal Assistant"
-        Width="1200"
-        Height="700"
-        WindowStartupLocation="CenterScreen">
+        Title="Legal Assistant" 
+        Width="1400" Height="800"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI">
 
-  <Window.Styles>
-    <Style Selector="Window">
-      <Setter Property="Background" Value="#eef1f5" />
-    </Style>
+    <Window.Resources>
+        <converters:NotNullToBoolConverter x:Key="NotNullToBoolConverter" />
+        <converters:EventStatusToColorConverter x:Key="EventStatusToColorConverter" />
+        <converters:DateTimeToDateOnlyConverter x:Key="DateTimeToDateOnlyConverter" />
+        <converters:DateTimeToNullableConverter x:Key="DateTimeToNullableConverter" />
+        <converters:SafeBindingConverter x:Key="SafeBindingConverter" />
+        <converters:DecimalConverter x:Key="DecimalConverter" />
+    </Window.Resources>
 
-    <Style Selector="Border#sidebar">
-      <Setter Property="Background" Value="#f3f5f8" />
-      <Setter Property="Width" Value="260" />
-    </Style>
+    <Window.Styles>
+        <!-- Основные стили -->
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{DynamicResource ThemeWindowBackground}"/>
+        </Style>
 
-    <Style Selector="Button.menu">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="#333333" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Padding" Value="18,8" />
-      <Setter Property="Margin" Value="12,4,12,4" />
-      <Setter Property="HorizontalContentAlignment" Value="Left" />
-      <Setter Property="FontSize" Value="15" />
-      <Setter Property="Cursor" Value="Hand" />
-    </Style>
+        <!-- Левая панель -->
+        <Style Selector="Border#sidebar">
+            <Setter Property="Background" Value="{DynamicResource ThemeSidebarBackground}" />
+            <Setter Property="Width" Value="280"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+        </Style>
 
-    <Style Selector="Button.menu:pointerover">
-      <Setter Property="Background" Value="#dde5f0" />
-      <Setter Property="Foreground" Value="#333333" />
-    </Style>
+        <!-- Кнопки меню -->
+        <Style Selector="Button.menu">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextSecondary}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
 
-    <Style Selector="Button.logout">
-      <Setter Property="Background" Value="#c62828" />
-      <Setter Property="Foreground" Value="White" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Padding" Value="14,8" />
-      <Setter Property="Margin" Value="40,0,40,24" />
-      <Setter Property="FontSize" Value="13" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Cursor" Value="Hand" />
-    </Style>
+        <Style Selector="Button.menu:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+        </Style>
 
-    <Style Selector="Button.logout:pointerover">
-      <Setter Property="Background" Value="#b71c1c" />
-      <Setter Property="Foreground" Value="White" />
-    </Style>
-  </Window.Styles>
+        <Style Selector="Button.menu:pressed">
+            <Setter Property="Background" Value="#5a6a62"/>
+        </Style>
 
-  <!-- шаблоны содержимого правой части -->
-  <Window.DataTemplates>
+        <!-- Кнопка выхода -->
+        <Style Selector="Button.logout">
+            <Setter Property="Background" Value="{DynamicResource ThemeSecondaryColor}"/>
+            <Setter Property="Foreground" Value="#ff9999"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Margin" Value="20,10,20,20"/>
+        </Style>
 
-    <!-- Домашний экран (приветствие) -->
-    <DataTemplate x:DataType="vm:MainWindowViewModel">
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="{Binding WelcomeMessage}"
-                   FontSize="22"
-                   Foreground="#2e7d32"
-                   FontWeight="SemiBold" />
-        <TextBlock Text="Выберите раздел в меню слева для начала работы"
-                   FontSize="14"
-                   Foreground="#666"
-                   Margin="0,10,0,0" />
-      </StackPanel>
-    </DataTemplate>
+        <Style Selector="Button.logout:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+        </Style>
 
-    <!-- Контрагенты -->
-    <DataTemplate x:DataType="vm:CounterpartyViewModel">
-      <Grid RowDefinitions="Auto,Auto,*" Margin="12">
-        <!-- поиск + основные кнопки -->
-        <Grid ColumnDefinitions="260,Auto,Auto,Auto,Auto" Margin="0,0,0,10">
-          <TextBox Grid.Column="0"
-                   Height="30"
-                   Watermark="Поиск по наименованию, ИНН, ОГРН"
-                   Text="{Binding SearchText, Mode=TwoWay}" />
-          <Button Grid.Column="1" Content="Найти"
-                  Command="{Binding SearchCommand}" MinWidth="80" Margin="8,0,0,0" />
-          <Button Grid.Column="2" Content="Добавить"
-                  Command="{Binding AddNewCommand}" MinWidth="90" Margin="8,0,0,0" />
-          <Button Grid.Column="3" Content="Сохранить"
-                  Command="{Binding SaveCommand}" MinWidth="100"
-                  IsEnabled="{Binding SelectedCounterparty}" Margin="8,0,0,0" />
-          <Button Grid.Column="4" Content="Удалить"
-                  Command="{Binding DeleteCommand}" MinWidth="90"
-                  IsEnabled="{Binding SelectedCounterparty}" Margin="8,0,0,0" />
-        </Grid>
+        <!-- Карточки -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
 
-        <!-- FNS API + статус -->
-        <Grid Grid.Row="1" ColumnDefinitions="100,260,Auto" Margin="0,0,0,10">
-          <TextBlock Grid.Column="0" Text="FNS API Key:" VerticalAlignment="Center" />
-          <TextBox Grid.Column="1"
-                   Height="28"
-                   Text="{Binding FnsApiKey, Mode=TwoWay}"
-                   Watermark="Ключ доступа к API ФНС/провайдера"
-                   Margin="8,0,0,0" />
-          <StackPanel Grid.Column="2" Orientation="Horizontal"
-                      Spacing="8" VerticalAlignment="Center" Margin="8,0,0,0">
-            <Button Content="Проверить по ФНС"
-                    Command="{Binding CheckWithFnsCommand}"
-                    IsEnabled="{Binding SelectedCounterparty}" />
-            <TextBlock Text="{Binding StatusMessage}"
-                       Foreground="#2e7d32"
-                       VerticalAlignment="Center" />
-          </StackPanel>
-        </Grid>
+        <!-- Заголовки секций -->
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
 
-        <!-- список + форма -->
-        <Grid Grid.Row="2" ColumnDefinitions="2*,*" >
-          <dg:DataGrid Grid.Column="0"
-                       ItemsSource="{Binding Counterparties}"
-                       SelectedItem="{Binding SelectedCounterparty, Mode=TwoWay}"
-                       AutoGenerateColumns="False"
-                       IsReadOnly="True"
-                       Margin="0,0,8,0">
-            <dg:DataGrid.Columns>
-              <dg:DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="2*" />
-              <dg:DataGridTextColumn Header="ИНН"          Binding="{Binding INN}"  Width="*" />
-              <dg:DataGridTextColumn Header="ОГРН"         Binding="{Binding OGRN}" Width="*" />
-              <dg:DataGridTextColumn Header="Статус"       Binding="{Binding Status}" Width="*" />
-              <dg:DataGridTextColumn Header="Уровень риска" Binding="{Binding RiskLevel}" Width="*" />
-            </dg:DataGrid.Columns>
-          </dg:DataGrid>
+        <!-- Заголовки полей -->
+        <Style Selector="TextBlock.field-label">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextSecondary}"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
 
-          <ScrollViewer Grid.Column="1">
-            <StackPanel Spacing="6">
-              <TextBlock Text="Карточка контрагента"
-                         FontWeight="SemiBold"
-                         FontSize="14"
-                         Margin="0,0,0,4" />
+        <!-- Поля ввода -->
+        <Style Selector="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
 
-              <TextBlock Text="Краткое наименование" />
-              <TextBox Text="{Binding SelectedCounterparty.Name, Mode=TwoWay}" />
+        <Style Selector="TextBox:focus">
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+        </Style>
 
-              <TextBlock Text="Полное наименование" />
-              <TextBox Text="{Binding SelectedCounterparty.FullName, Mode=TwoWay}" />
+        <Style Selector="TextBox:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}"/>
+        </Style>
+        
+        <Style Selector="TextBox TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+        </Style>
+        
+        <Style Selector="TextBox:watermark TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextMuted}"/>
+        </Style>
 
-              <TextBlock Text="ИНН" />
-              <TextBox Text="{Binding SelectedCounterparty.INN, Mode=TwoWay}" />
+        <!-- Ошибки валидации -->
+        <Style Selector="TextBox:validationerror">
+            <Setter Property="BorderBrush" Value="#b35454"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Background" Value="#ffebee"/>
+        </Style>
 
-              <TextBlock Text="КПП" />
-              <TextBox Text="{Binding SelectedCounterparty.KPP, Mode=TwoWay}" />
+        <!-- Кнопки действий -->
+        <Style Selector="Button.action-btn">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
 
-              <TextBlock Text="ОГРН" />
-              <TextBox Text="{Binding SelectedCounterparty.OGRN, Mode=TwoWay}" />
+        <Style Selector="Button.primary-btn">
+            <Setter Property="Background" Value="{DynamicResource ThemePrimaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
 
-              <TextBlock Text="Юридический адрес" />
-              <TextBox Text="{Binding SelectedCounterparty.LegalAddress, Mode=TwoWay}" />
+        <Style Selector="Button.primary-btn:pointerover">
+            <Setter Property="Background" Value="#4a7a6a"/>
+        </Style>
 
-              <TextBlock Text="Фактический адрес" />
-              <TextBox Text="{Binding SelectedCounterparty.ActualAddress, Mode=TwoWay}" />
+        <Style Selector="Button.success-btn">
+            <Setter Property="Background" Value="#4a8a6a"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
 
-              <TextBlock Text="Телефон" />
-              <TextBox Text="{Binding SelectedCounterparty.Phone, Mode=TwoWay}" />
+        <Style Selector="Button.success-btn:pointerover">
+            <Setter Property="Background" Value="#3a7a5a"/>
+        </Style>
 
-              <TextBlock Text="E-mail" />
-              <TextBox Text="{Binding SelectedCounterparty.Email, Mode=TwoWay}" />
+        <Style Selector="Button.danger-btn">
+            <Setter Property="Background" Value="#b35454"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
 
-              <TextBlock Text="Директор" />
-              <TextBox Text="{Binding SelectedCounterparty.DirectorName, Mode=TwoWay}" />
+        <Style Selector="Button.danger-btn:pointerover">
+            <Setter Property="Background" Value="#a34444"/>
+        </Style>
 
-              <TextBlock Text="Статус" />
-              <TextBox Text="{Binding SelectedCounterparty.Status, Mode=TwoWay}" />
+        <Style Selector="Button.secondary-btn">
+            <Setter Property="Background" Value="{DynamicResource ThemeSecondaryColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextSecondary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+        </Style>
 
-              <TextBlock Text="Уровень риска" />
-              <TextBox Text="{Binding SelectedCounterparty.RiskLevel, Mode=TwoWay}" />
+        <Style Selector="Button.secondary-btn:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+        </Style>
 
-              <TextBlock Text="Заметки" />
-              <TextBox Text="{Binding SelectedCounterparty.Notes, Mode=TwoWay}"
-                       AcceptsReturn="True" Height="80" />
+        <!-- DataGrid стили -->
+        <Style Selector="dg|DataGrid">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
 
-              <Separator Margin="0,8,0,4" />
+        <Style Selector="dg|DataGridColumnHeader">
+            <Setter Property="Background" Value="{DynamicResource ThemeSecondaryColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="12,10"/>
+        </Style>
 
-              <TextBlock Text="Результаты проверки ФНС"
-                         FontWeight="SemiBold"
-                         FontSize="14" />
+        <Style Selector="dg|DataGridColumnHeader:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+        </Style>
 
-              <StackPanel>
-                <TextBlock Text="{Binding LastAuditHistory.Source}"   FontStyle="Italic" />
-                <TextBlock Text="{Binding LastAuditHistory.CheckDate}" FontSize="11" />
-                <TextBlock Text="{Binding LastAuditHistory.RiskLevel}" FontSize="11" />
-                <TextBlock Text="{Binding LastAuditHistory.Findings}"
-                           FontSize="11" TextWrapping="Wrap" />
-              </StackPanel>
-            </StackPanel>
-          </ScrollViewer>
-        </Grid>
-      </Grid>
-    </DataTemplate>
+        <Style Selector="dg|DataGridCell">
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+        </Style>
 
-    <!-- Документы -->
-    <DataTemplate x:DataType="vm:DocumentViewModel">
-      <Grid RowDefinitions="Auto,*" Margin="12">
-        <Grid ColumnDefinitions="260,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,10">
-          <TextBox Grid.Column="0"
-                   Height="30"
-                   Watermark="Поиск по названию, номеру, тегам"
-                   Text="{Binding SearchText, Mode=TwoWay}" />
-          <Button Grid.Column="1" Content="Найти"
-                  Command="{Binding SearchCommand}" MinWidth="80" Margin="8,0,0,0" />
-          <Button Grid.Column="2" Content="Добавить"
-                  Command="{Binding AddNewCommand}" MinWidth="90" Margin="8,0,0,0" />
-          <Button Grid.Column="3" Content="Сохранить"
-                  Command="{Binding SaveCommand}" MinWidth="100"
-                  IsEnabled="{Binding SelectedDocument}" Margin="8,0,0,0" />
-          <Button Grid.Column="4" Content="Удалить"
-                  Command="{Binding DeleteCommand}" MinWidth="90"
-                  IsEnabled="{Binding SelectedDocument}" Margin="8,0,0,0" />
-          <Button Grid.Column="5" Content="Отчёт (PDF)"
-                  Command="{Binding ExportReportCommand}" MinWidth="110" Margin="8,0,0,0" />
-        </Grid>
+        <Style Selector="dg|DataGridCell TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+        </Style>
 
-        <Grid Grid.Row="1" ColumnDefinitions="2*,*">
-          <dg:DataGrid Grid.Column="0"
-                       ItemsSource="{Binding Documents}"
-                       SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
-                       AutoGenerateColumns="False"
-                       IsReadOnly="True"
-                       Margin="0,0,8,0">
-            <dg:DataGrid.Columns>
-              <dg:DataGridTextColumn Header="Название" Binding="{Binding Title}"          Width="2*" />
-              <dg:DataGridTextColumn Header="Номер"    Binding="{Binding DocumentNumber}" Width="*" />
-              <dg:DataGridTextColumn Header="Тип"      Binding="{Binding DocumentType}"   Width="*" />
-              <dg:DataGridTextColumn Header="Статус"   Binding="{Binding Status}"         Width="*" />
-              <dg:DataGridTextColumn Header="Дата"     Binding="{Binding DocumentDate}"   Width="*" />
-            </dg:DataGrid.Columns>
-          </dg:DataGrid>
+        <Style Selector="dg|DataGridRow">
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+        </Style>
 
-          <ScrollViewer Grid.Column="1">
-            <StackPanel Spacing="6">
-              <TextBlock Text="Карточка документа"
-                         FontWeight="SemiBold"
-                         FontSize="14"
-                         Margin="0,0,0,4" />
+        <Style Selector="dg|DataGridRow:selected">
+            <Setter Property="Background" Value="#e8f0ed"/>
+        </Style>
 
-              <TextBlock Text="Название" />
-              <TextBox Text="{Binding SelectedDocument.Title, Mode=TwoWay}" />
+        <!-- CheckBox стили -->
+        <Style Selector="CheckBox">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="CheckBox:checked">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="CheckBox TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="CheckBox:checked TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
 
-              <TextBlock Text="Номер" />
-              <TextBox Text="{Binding SelectedDocument.DocumentNumber, Mode=TwoWay}" />
+        <!-- DatePicker стили -->
+        <Style Selector="DatePicker">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="BorderBrush" Value="#c9d2d0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
 
-              <TextBlock Text="Тип" />
-              <TextBox Text="{Binding SelectedDocument.DocumentType, Mode=TwoWay}" />
+        <Style Selector="DatePicker:focus">
+            <Setter Property="BorderBrush" Value="#5a8a7a"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
 
-              <TextBlock Text="Статус" />
-              <TextBox Text="{Binding SelectedDocument.Status, Mode=TwoWay}" />
+        <Style Selector="DatePicker TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
 
-              <TextBlock Text="Дата документа" />
-              <DatePicker SelectedDate="{Binding SelectedDocument.DocumentDate, Mode=TwoWay}" />
+        <!-- ComboBox стили -->
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="BorderBrush" Value="#c9d2d0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
 
-              <TextBlock Text="Сумма" />
-              <TextBox Text="{Binding SelectedDocument.Amount, Mode=TwoWay}" />
+        <Style Selector="ComboBox:focus">
+            <Setter Property="BorderBrush" Value="#5a8a7a"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
 
-              <TextBlock Text="Валюта" />
-              <TextBox Text="{Binding SelectedDocument.Currency, Mode=TwoWay}" />
+        <Style Selector="ComboBox TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <!-- ListBox стили -->
+        <Style Selector="ListBox">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem:selected TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem:pointerover TextBlock">
+            <Setter Property="Foreground" Value="#2d3e36"/>
+        </Style>
+    </Window.Styles>
 
-              <TextBlock Text="Теги" />
-              <TextBox Text="{Binding SelectedDocument.Tags, Mode=TwoWay}" />
+    <Window.DataTemplates>
+        <!-- Домашний экран -->
+        <DataTemplate DataType="vm:MainWindowViewModel">
+            <Grid RowDefinitions="Auto,*">
+                <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,10">
+                    <TextBlock Text="{Binding WelcomeMessage}"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="#2d3e36"/>
+                    <TextBlock Text="Выберите раздел в меню слева для начала работы"
+                               FontSize="14"
+                               Foreground="#8a9a92"/>
+                </StackPanel>
 
-              <TextBlock Text="Конфиденциальный" />
-              <CheckBox IsChecked="{Binding SelectedDocument.IsConfidential, Mode=TwoWay}" />
+                <!-- Ближайшие события на главной панели -->
+                <Border Grid.Row="1" Classes="card">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="{Binding UpcomingEventsTitle}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#3a4a42"
+                                   Margin="0,0,0,10"/>
 
-              <TextBlock Text="Содержимое (кратко)" />
-              <TextBox Text="{Binding SelectedDocument.Content, Mode=TwoWay}"
-                       AcceptsReturn="True" Height="80" />
-            </StackPanel>
-          </ScrollViewer>
-        </Grid>
-      </Grid>
-    </DataTemplate>
+                        <dg:DataGrid Grid.Row="1"
+                                     ItemsSource="{Binding HomeUpcomingEvents}"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="True"
+                                     Background="White"
+                                     Foreground="#2d3e36">
+                            <dg:DataGrid.Columns>
+                                <dg:DataGridTextColumn Header="Событие"
+                                                      Binding="{Binding Title}"
+                                                      Width="2*"/>
+                                <dg:DataGridTextColumn Header="Документ"
+                                                      Binding="{Binding Document.Title}"
+                                                      Width="2*"/>
+                                <dg:DataGridTextColumn Header="Срок"
+                                                      Binding="{Binding EventDate, StringFormat='dd.MM.yyyy HH:mm'}"
+                                                      Width="*"/>
+                                <dg:DataGridTextColumn Header="Статус"
+                                                      Binding="{Binding Status}"
+                                                      Width="*"/>
+                            </dg:DataGrid.Columns>
+                        </dg:DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DataTemplate>
 
-    <!-- События -->
-    <DataTemplate x:DataType="vm:EventsViewModel">
-      <Grid RowDefinitions="Auto,*" Margin="12">
-        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-          <TextBlock Text="Срок до:" VerticalAlignment="Center" />
-          <DatePicker SelectedDate="{Binding UntilDate, Mode=TwoWay}" />
-          <Button Content="Обновить" Command="{Binding RefreshCommand}" />
-        </StackPanel>
+        <!-- Раздел Контрагенты -->
+        <DataTemplate DataType="vm:CounterpartyViewModel">
+            <Grid RowDefinitions="Auto,*" Margin="10">
+                <!-- Панель управления -->
+                <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
+                    <TextBlock Text="Управление контрагентами"
+                               Classes="section-title"/>
+                    
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                        <TextBox Grid.Column="0"
+                                 Height="40"
+                                 Watermark="Поиск по наименованию, ИНН, ОГРН"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="1"
+                                Content="Найти"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding SearchCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="2"
+                                Content="Добавить"
+                                Classes="action-btn success-btn"
+                                Command="{Binding AddNewCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="3"
+                                Content="Сохранить"
+                                Classes="action-btn primary-btn"
+                                Command="{Binding SaveCommand}"
+                                IsEnabled="{Binding SelectedCounterparty, Converter={StaticResource NotNullToBoolConverter}}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="4"
+                                Content="Удалить"
+                                Classes="action-btn danger-btn"
+                                Command="{Binding DeleteCommand}"
+                                IsEnabled="{Binding SelectedCounterparty, Converter={StaticResource NotNullToBoolConverter}}"/>
+                    </Grid>
 
-        <dg:DataGrid Grid.Row="1"
-                     ItemsSource="{Binding UpcomingEvents}"
-                     AutoGenerateColumns="False"
-                     IsReadOnly="True">
-          <dg:DataGrid.Columns>
-            <dg:DataGridTextColumn Header="Документ" Binding="{Binding Document.Title}" Width="2*" />
-            <dg:DataGridTextColumn Header="Событие"  Binding="{Binding Title}"          Width="2*" />
-            <dg:DataGridTextColumn Header="Тип"      Binding="{Binding EventType}"      Width="*" />
-            <dg:DataGridTextColumn Header="Срок"     Binding="{Binding DueDate}"        Width="*" />
-            <dg:DataGridTextColumn Header="Статус"   Binding="{Binding Status}"         Width="*" />
-          </dg:DataGrid.Columns>
-        </dg:DataGrid>
-      </Grid>
-    </DataTemplate>
+                    <!-- API ФНС -->
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Text="API ФНС:"
+                                   VerticalAlignment="Center"
+                                   FontWeight="Medium"
+                                   Foreground="#3a4a42"/>
+                        
+                        <TextBox Grid.Column="1"
+                                 Height="36"
+                                 Text="{Binding FnsApiKey, Mode=TwoWay}"
+                                 Watermark="Введите ключ доступа к API ФНС"
+                                 IsEnabled="{Binding SelectedCounterparty, Converter={StaticResource NotNullToBoolConverter}}"
+                                 Margin="12,0,12,0"/>
+                        
+                        <Button Grid.Column="2"
+                                Content="Проверить"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding CheckWithFnsCommand}"
+                                IsEnabled="{Binding SelectedCounterparty, Converter={StaticResource NotNullToBoolConverter}}"/>
+                    </Grid>
+                    
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="{Binding StatusColor}"
+                               FontSize="13"
+                               FontWeight="Medium"/>
+                </StackPanel>
 
-  </Window.DataTemplates>
+                <!-- Основной контент -->
+                <Grid Grid.Row="1" ColumnDefinitions="2*,*">
+                    <!-- Таблица контрагентов -->
+                    <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
+                        <Grid RowDefinitions="Auto,*">
+                            <TextBlock Text="Список контрагентов"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#3a4a42"
+                                       Margin="0,0,0,16"/>
 
-  <!-- общий каркас: левый сайдбар + правая область -->
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="260" />
-      <ColumnDefinition Width="*" />
-    </Grid.ColumnDefinitions>
+                            <dg:DataGrid Grid.Row="1"
+                                        ItemsSource="{Binding Counterparties}"
+                                        SelectedItem="{Binding SelectedCounterparty, Mode=TwoWay}"
+                                        AutoGenerateColumns="False"
+                                        IsReadOnly="True">
+                                <dg:DataGrid.Columns>
+                                    <dg:DataGridTextColumn Header="Наименование"
+                                                          Binding="{Binding Name}"
+                                                          Width="3*"/>
+                                    <dg:DataGridTextColumn Header="ИНН"
+                                                          Binding="{Binding INN}"
+                                                          Width="*"/>
+                                    <dg:DataGridTextColumn Header="ОГРН"
+                                                          Binding="{Binding OGRN}"
+                                                          Width="*"/>
+                                    <dg:DataGridTextColumn Header="Статус"
+                                                          Binding="{Binding Status}"
+                                                          Width="*"/>
+                                    <dg:DataGridTextColumn Header="Риск"
+                                                          Binding="{Binding RiskLevel}"
+                                                          Width="*"/>
+                                </dg:DataGrid.Columns>
+                            </dg:DataGrid>
+                        </Grid>
+                    </Border>
 
-    <!-- левый сайдбар -->
-    <Border Grid.Column="0" Classes="sidebar">
-      <Grid RowDefinitions="Auto,*,Auto,Auto">
-        <!-- аккаунт -->
-        <StackPanel Grid.Row="0" Margin="20,24,20,16" Spacing="4">
-          <TextBlock Text="Аккаунт" FontSize="11" Foreground="#888" />
-          <TextBlock Text="{Binding CurrentUserName}"
-                     FontSize="15"
-                     FontWeight="SemiBold"
-                     Foreground="#222" />
-        </StackPanel>
+                    <!-- Форма редактирования -->
+                    <Border Grid.Column="1" Classes="card">
+                        <ScrollViewer>
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Редактирование"
+                                           Classes="section-title"/>
 
-        <!-- меню (без Главная) -->
-        <StackPanel Grid.Row="1" Spacing="2">
-          <Button Content="Контрагенты"
-                  Classes="menu"
-                  Command="{Binding ShowCounterpartiesCommand}" />
-          <Button Content="Документы"
-                  Classes="menu"
-                  Command="{Binding ShowDocumentsCommand}" />
-          <Button Content="События"
-                  Classes="menu"
-                  Command="{Binding ShowEventsCommand}" />
-        </StackPanel>
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="Краткое наименование *"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.Name, Mode=TwoWay}"/>
 
-        <!-- настройки над выходом (позже добавишь команду ShowSettingsCommand) -->
-        <Button Grid.Row="2"
-                Content="Настройки"
-                Classes="menu"
-                HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="Тип контрагента *"
+                                               Classes="field-label"/>
+                                    <ComboBox SelectedItem="{Binding SelectedCounterparty.Type, Mode=TwoWay}"
+                                              Padding="12,10">
+                                        <ComboBox.Items>
+                                            <x:String>Юр.лицо</x:String>
+                                            <x:String>Физ.лицо</x:String>
+                                        </ComboBox.Items>
+                                    </ComboBox>
 
-        <!-- выход в самом низу -->
-        <Button Grid.Row="3"
-                Content="Выход"
-                Classes="logout"
-                Command="{Binding LogoutCommand}" />
-      </Grid>
-    </Border>
+                                    <TextBlock Text="Полное наименование"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.FullName, Mode=TwoWay}"/>
 
-    <!-- правая часть -->
-    <Border Grid.Column="1"
-            Background="White"
-            Margin="8"
-            CornerRadius="4">
-      <Grid RowDefinitions="Auto,*">
-        <TextBlock Grid.Row="0"
-                   Text="Legal Assistant"
-                   FontSize="11"
-                   Foreground="#999"
-                   HorizontalAlignment="Right"
-                   Margin="0,6,10,0" />
-        <ContentControl Grid.Row="1"
-                        Content="{Binding CurrentContent}" />
-      </Grid>
-    </Border>
-  </Grid>
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="ИНН *"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.INN, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="КПП *"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.KPP, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="ОГРН"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.OGRN, Mode=TwoWay}"/>
+
+                                    <TextBlock Text="Юридический адрес"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.LegalAddress, Mode=TwoWay}"
+                                             AcceptsReturn="True"
+                                             Height="60"/>
+
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="Телефон *"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.Phone, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="Email *"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.Email, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="Контактное лицо *"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.ContactPerson, Mode=TwoWay}"/>
+
+                                    <TextBlock Text="Директор"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.DirectorName, Mode=TwoWay}"/>
+
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="Статус"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.Status, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="Уровень риска"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding SelectedCounterparty.RiskLevel, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="Заметки"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedCounterparty.Notes, Mode=TwoWay}"
+                                             AcceptsReturn="True"
+                                             Height="80"/>
+                                </StackPanel>
+
+                                <!-- Результаты проверки ФНС -->
+                                <Border Background="#e8f0ed"
+                                        CornerRadius="6"
+                                        Padding="16"
+                                        Margin="0,20,0,0"
+                                        IsVisible="{Binding LastAuditHistory}">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Результаты проверки ФНС"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#3a4a42"/>
+                                        
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <TextBlock Text="Источник:"
+                                                       FontSize="12"
+                                                       Foreground="#5a6a62"/>
+                                            <TextBlock Text="{Binding LastAuditHistory.Source}"
+                                                       FontSize="12"
+                                                       FontWeight="Medium"
+                                                       Foreground="#2d3e36"
+                                                       Margin="8,0,0,0"/>
+                                        </Grid>
+                                        
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <TextBlock Text="Дата проверки:"
+                                                       FontSize="12"
+                                                       Foreground="#5a6a62"/>
+                                            <TextBlock Text="{Binding LastAuditHistory.CheckDate, StringFormat='dd.MM.yyyy HH:mm'}"
+                                                       FontSize="12"
+                                                       FontWeight="Medium"
+                                                       Foreground="#2d3e36"
+                                                       Margin="8,0,0,0"/>
+                                        </Grid>
+                                        
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <TextBlock Text="Уровень риска:"
+                                                       FontSize="12"
+                                                       Foreground="#5a6a62"/>
+                                            <TextBlock Text="{Binding LastAuditHistory.RiskLevel}"
+                                                       FontSize="12"
+                                                       FontWeight="Medium"
+                                                       Foreground="#2d3e36"
+                                                       Margin="8,0,0,0"/>
+                                        </Grid>
+                                        
+                                        <TextBlock Text="Результаты:"
+                                                   FontSize="12"
+                                                   Foreground="#5a6a62"
+                                                   Margin="0,4,0,0"/>
+                                        <TextBlock Text="{Binding LastAuditHistory.Findings}"
+                                                   FontSize="12"
+                                                   Foreground="#2d3e36"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Раздел Документы -->
+        <DataTemplate DataType="vm:DocumentViewModel">
+            <Grid RowDefinitions="Auto,*" Margin="10">
+                <!-- Панель управления -->
+                <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
+                    <TextBlock Text="Управление документами"
+                               Classes="section-title"/>
+                    
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        <TextBox Grid.Column="0"
+                                 Height="40"
+                                 Watermark="Поиск по названию, номеру, тегам"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="1"
+                                Content="Найти"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding SearchCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="2"
+                                Content="Сканировать диски"
+                                Classes="action-btn success-btn"
+                                Command="{Binding ScanDisksCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="3"
+                                Content="Добавить"
+                                Classes="action-btn success-btn"
+                                Command="{Binding AddNewCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="4"
+                                Content="Сохранить"
+                                Classes="action-btn primary-btn"
+                                Command="{Binding SaveCommand}"
+                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="5"
+                                Content="Удалить"
+                                Classes="action-btn danger-btn"
+                                Command="{Binding DeleteCommand}"
+                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="6"
+                                Content="Открыть"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding OpenFileCommand}"
+                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                Margin="0,0,12,0"/>
+
+                        <Button Grid.Column="7"
+                                Content="Отчёт PDF"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding ExportReportCommand}"
+                                IsEnabled="{Binding Documents.Count}"/>
+                    </Grid>
+                    
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="#4a8a6a"
+                               FontSize="13"
+                               FontWeight="Medium"/>
+                </StackPanel>
+
+                <!-- Основной контент -->
+                <Grid Grid.Row="1" ColumnDefinitions="2*,*">
+                    <!-- Таблица документов -->
+                    <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
+                        <Grid RowDefinitions="Auto,Auto,*">
+                            <TextBlock Text="Список документов"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#3a4a42"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Отладочная информация -->
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding Documents.Count, StringFormat='Количество документов: {0}'}"
+                                       FontSize="12"
+                                       Foreground="#8a9a92"
+                                       Margin="0,0,0,8"
+                                       IsVisible="{Binding Documents.Count, Converter={StaticResource NotNullToBoolConverter}}"/>
+
+                            <ListBox x:Name="DocumentsListBox"
+                                    Grid.Row="2"
+                                    ItemsSource="{Binding Documents}"
+                                    SelectedItem="{Binding SelectedDisplayItem, Mode=TwoWay}"
+                                    Background="White"
+                                    Foreground="#2d3e36"
+                                    MinHeight="500"
+                                    VerticalAlignment="Stretch"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent" Padding="8,6" Margin="0,1" ClipToBounds="True">
+                                            <Grid ColumnDefinitions="3*,*,*,*,*" ClipToBounds="True">
+                                                <TextBlock Grid.Column="0" 
+                                                          Text="{Binding Title}" 
+                                                          FontWeight="Medium"
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="1" 
+                                                          Text="{Binding DocumentNumber, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="2" 
+                                                          Text="{Binding DocumentType, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="3" 
+                                                          Text="{Binding Status, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="4" 
+                                                          Text="{Binding DocumentDateString, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#e8f5e9"/>
+                                    </Style>
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#f1f8f4"/>
+                                    </Style>
+                                </ListBox.Styles>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- Форма редактирования -->
+                    <Border Grid.Column="1" Classes="card">
+                        <ScrollViewer>
+                            <StackPanel Spacing="16" DataContext="{Binding}">
+                                <!-- Форма редактирования (видна когда документ выбран) -->
+                                <StackPanel Spacing="16" IsVisible="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}">
+                                    <TextBlock Text="Редактирование документа"
+                                               Classes="section-title"/>
+
+                                    <StackPanel Spacing="12">
+                                        <TextBlock Text="Название"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.Title, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"/>
+
+                                        <TextBlock Text="Номер документа"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.DocumentNumber, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"/>
+
+                                        <TextBlock Text="Тип документа"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.DocumentType, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"/>
+
+                                        <TextBlock Text="Статус"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.Status, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"/>
+
+                                        <TextBlock Text="Дата документа"
+                                                   Classes="field-label"/>
+                                        <DatePicker SelectedDate="{Binding SelectedDocumentDate, Mode=TwoWay, Converter={StaticResource DateTimeToNullableConverter}}"
+                                                    Padding="12,10"/>
+
+                                        <Grid ColumnDefinitions="*,*">
+                                            <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                                <TextBlock Text="Сумма"
+                                                           Classes="field-label"/>
+                                                <TextBox Text="{Binding SelectedDocument.Amount, Mode=TwoWay, Converter={StaticResource DecimalConverter}, TargetNullValue='0', FallbackValue='0'}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                                <TextBlock Text="Валюта"
+                                                           Classes="field-label"/>
+                                                <TextBox Text="{Binding SelectedDocument.Currency, Mode=TwoWay, TargetNullValue='RUB', FallbackValue='RUB'}"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock Text="Теги (через запятую)"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.Tags, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"/>
+
+                                        <TextBlock Text="Контрагент"
+                                                   Classes="field-label"/>
+                                        <ComboBox ItemsSource="{Binding Counterparties}"
+                                                  SelectedItem="{Binding SelectedDocument.Counterparty, Mode=TwoWay}"
+                                                  Padding="12,10"/>
+
+                                        <CheckBox Content="Конфиденциальный документ"
+                                                  IsChecked="{Binding SelectedDocument.IsConfidential, Mode=TwoWay, TargetNullValue=False, FallbackValue=False}"/>
+
+                                        <TextBlock Text="Файл"
+                                                   Classes="field-label"/>
+                                        <TextBlock Text="{Binding SelectedDocument.FileName, TargetNullValue='Файл не выбран', FallbackValue='Файл не выбран'}"
+                                                   FontSize="12"
+                                                   Foreground="#5a6a62"/>
+
+                                        <TextBlock Text="Содержание (краткое описание)"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SelectedDocument.Content, Mode=TwoWay, TargetNullValue='', FallbackValue=''}"
+                                                 AcceptsReturn="True"
+                                                 Height="100"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Кнопки действий -->
+                                    <Grid ColumnDefinitions="*,*,*" Margin="0,20,0,0">
+                                        <Button Grid.Column="0"
+                                                Content="Сохранить"
+                                                Classes="action-btn primary-btn"
+                                                Command="{Binding SaveCommand}"
+                                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="0,0,4,0"/>
+                                        
+                                        <Button Grid.Column="1"
+                                                Content="Удалить"
+                                                Classes="action-btn danger-btn"
+                                                Command="{Binding DeleteCommand}"
+                                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4,0,4,0"/>
+                                        
+                                        <Button Grid.Column="2"
+                                                Content="Открыть"
+                                                Classes="action-btn secondary-btn"
+                                                Command="{Binding OpenFileCommand}"
+                                                IsEnabled="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                                
+                                <!-- Сообщение (видно когда документ не выбран) -->
+                                <StackPanel Spacing="16" IsVisible="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}, ConverterParameter=Invert}">
+                                    <TextBlock Text="Выберите документ из списка для редактирования"
+                                               Classes="section-title"
+                                               Foreground="#8a9a92"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Раздел События -->
+        <DataTemplate DataType="vm:EventsViewModel">
+            <Grid RowDefinitions="Auto,*" Margin="10">
+                <!-- Панель управления -->
+                <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
+                    <TextBlock Text="Календарь событий"
+                               Classes="section-title"/>
+                    
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto">
+                        <TextBox Grid.Column="0"
+                                 Height="40"
+                                 Watermark="Поиск событий"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 Margin="0,0,12,0"/>
+                        
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding EventsUntilLabel}"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"
+                                   Foreground="#5a6a62"/>
+                        
+                        <DatePicker Grid.Column="2"
+                                    SelectedDate="{Binding UntilDate, Mode=TwoWay, Converter={StaticResource DateTimeToNullableConverter}}"
+                                    Padding="12,10"
+                                    Margin="12,0,12,0"/>
+                        
+                        <Button Grid.Column="3"
+                                Content="Добавить"
+                                Classes="action-btn success-btn"
+                                Command="{Binding AddNewEventCommand}"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button Grid.Column="4"
+                                Content="Обновить"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding RefreshCommand}"
+                                IsEnabled="{Binding !IsLoading}"/>
+                        
+                        <Button Grid.Column="5"
+                                Content="Экспорт"
+                                Classes="action-btn secondary-btn"
+                                Command="{Binding ExportCommand}"/>
+                    </Grid>
+                    
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="{Binding StatusColor}"
+                               FontSize="13"
+                               FontWeight="Medium"/>
+                </StackPanel>
+
+                <!-- Основной контент -->
+                <Grid Grid.Row="1" ColumnDefinitions="2*,*">
+                    <!-- Таблица событий -->
+                    <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
+                        <Grid RowDefinitions="Auto,Auto,*" MinHeight="500">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,0,0,16">
+                                <TextBlock Text="{Binding UpcomingEventsLabel}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#3a4a42"/>
+                                
+                                <ProgressBar IsIndeterminate="True" 
+                                           IsVisible="{Binding IsLoading}"
+                                           Width="100"/>
+                            </StackPanel>
+
+                            <!-- Отладочная информация -->
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding UpcomingEvents.Count, StringFormat='Количество событий: {0}'}"
+                                       FontSize="12"
+                                       Foreground="#8a9a92"
+                                       Margin="0,0,0,8"
+                                       IsVisible="{Binding UpcomingEvents.Count, Converter={StaticResource NotNullToBoolConverter}}"/>
+
+                            <ListBox x:Name="EventsListBox"
+                                    Grid.Row="2"
+                                    ItemsSource="{Binding UpcomingEvents}"
+                                    SelectedItem="{Binding SelectedDisplayItem, Mode=TwoWay}"
+                                    Background="White"
+                                    Foreground="#2d3e36"
+                                    MinHeight="500"
+                                    VerticalAlignment="Stretch"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent" Padding="8,6" Margin="0,1" ClipToBounds="True">
+                                            <Grid ColumnDefinitions="2*,2*,*,*,*" ClipToBounds="True">
+                                                <TextBlock Grid.Column="0" 
+                                                          Text="{Binding Title}" 
+                                                          FontWeight="Medium"
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="1" 
+                                                          Text="{Binding DocumentTitle, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="2" 
+                                                          Text="{Binding EventType, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="3" 
+                                                          Text="{Binding EventDateString, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                                <TextBlock Grid.Column="4" 
+                                                          Text="{Binding Status, TargetNullValue='-'}" 
+                                                          Foreground="#2d3e36"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          TextWrapping="NoWrap"
+                                                          ClipToBounds="True"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#e8f5e9"/>
+                                    </Style>
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#f1f8f4"/>
+                                    </Style>
+                                </ListBox.Styles>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- Форма редактирования события -->
+                    <Border Grid.Column="1" Classes="card">
+                        <ScrollViewer>
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="{Binding EditEventLabel}"
+                                           Classes="section-title"/>
+
+                                <StackPanel Spacing="12" IsVisible="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}}"
+                                            Name="EventEditPanel">
+                                    <TextBlock Text="Название события"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedEvent.Title, Mode=TwoWay, TargetNullValue=''}"/>
+
+                                    <TextBlock Text="Описание"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding SelectedEvent.Description, Mode=TwoWay, TargetNullValue=''}"
+                                             AcceptsReturn="True"
+                                             Height="80"/>
+
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="Дата события"
+                                                       Classes="field-label"/>
+                                            <DatePicker SelectedDate="{Binding SelectedEventDate, Mode=TwoWay, Converter={StaticResource DateTimeToNullableConverter}}"
+                                                        Padding="12,10"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="Время (HH:mm)"
+                                                       Classes="field-label"/>
+                                            <TextBox Text="{Binding EventTime, Mode=TwoWay}"
+                                                     Watermark="12:00"
+                                                     Padding="12,10"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="Тип события"
+                                                       Classes="field-label"/>
+                                            <ComboBox SelectedItem="{Binding SelectedEvent.EventType, Mode=TwoWay, TargetNullValue=''}"
+                                                      ItemsSource="{Binding EventTypes}"
+                                                      Padding="12,10"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="Статус"
+                                                       Classes="field-label"/>
+                                            <ComboBox SelectedItem="{Binding SelectedEvent.Status, Mode=TwoWay, TargetNullValue=''}"
+                                                      ItemsSource="{Binding EventStatuses}"
+                                                      Padding="12,10"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                            <TextBlock Text="Связанный документ"
+                                                       Classes="field-label"/>
+                                            <ComboBox SelectedItem="{Binding SelectedEvent.Document, Mode=TwoWay}"
+                                                      ItemsSource="{Binding Documents}"
+                                                      Padding="12,10"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                            <TextBlock Text="Контрагент"
+                                                       Classes="field-label"/>
+                                            <ComboBox SelectedItem="{Binding SelectedEvent.Counterparty, Mode=TwoWay}"
+                                                      ItemsSource="{Binding Counterparties}"
+                                                      Padding="12,10"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Настройки напоминания -->
+                                    <Border Background="#e8f0ed"
+                                            CornerRadius="6"
+                                            Padding="12"
+                                            Margin="0,12,0,0">
+                                        <StackPanel Spacing="8">
+                                            <CheckBox Content="Включить напоминание"
+                                                      IsChecked="{Binding SelectedEvent.HasReminder, Mode=TwoWay, TargetNullValue=False}"/>
+                                            
+                                            <Grid ColumnDefinitions="*,*" IsVisible="{Binding SelectedEvent.HasReminder, TargetNullValue=False}">
+                                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                                    <TextBlock Text="Напомнить за:"
+                                                               FontSize="12"
+                                                               Foreground="#5a6a62"/>
+                                                    <ComboBox ItemsSource="{Binding ReminderOptions}"
+                                                              SelectedItem="{Binding SelectedReminderOption, Mode=TwoWay}"
+                                                              Padding="12,10"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                                    <TextBlock Text="Email уведомления:"
+                                                               FontSize="12"
+                                                               Foreground="#5a6a62"/>
+                                                    <TextBox Text="{Binding SelectedEvent.NotificationEmail, Mode=TwoWay, TargetNullValue=''}"
+                                                             Padding="12,10"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Кнопки действий -->
+                                    <Grid ColumnDefinitions="*,*,*" Margin="0,20,0,0">
+                                        <Button Grid.Column="0"
+                                                Content="Сохранить"
+                                                Classes="action-btn primary-btn"
+                                                Command="{Binding SaveEventCommand}"
+                                                IsEnabled="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="0,0,4,0"/>
+                                        
+                                        <Button Grid.Column="1"
+                                                Content="Завершить"
+                                                Classes="action-btn success-btn"
+                                                Command="{Binding MarkCompletedCommand}"
+                                                CommandParameter="{Binding SelectedEvent}"
+                                                IsEnabled="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4,0,4,0"/>
+                                        
+                                        <Button Grid.Column="2"
+                                                Content="Удалить"
+                                                Classes="action-btn danger-btn"
+                                                Command="{Binding DeleteEventCommand}"
+                                                IsEnabled="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                                
+                                <!-- Сообщение, когда событие не выбрано -->
+                                <StackPanel Spacing="12" 
+                                            IsVisible="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}, ConverterParameter=Invert}">
+                                    <TextBlock Text="Выберите событие из списка для редактирования"
+                                               Classes="section-title"
+                                               Foreground="#8a9a92"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Раздел Настройки -->
+        <DataTemplate DataType="vm:SettingsViewModel">
+            <Grid RowDefinitions="Auto,*" Margin="10">
+                <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
+                    <TextBlock Text="{Binding ApplicationSettingsTitle}"
+                               Classes="section-title"/>
+                </StackPanel>
+
+                <Border Grid.Row="1" Classes="card">
+                    <ScrollViewer>
+                        <StackPanel Spacing="20">
+                            <!-- Язык -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding LanguageLabel}"
+                                           Classes="field-label"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding Languages}"
+                                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                          Padding="12,10"/>
+                            </StackPanel>
+
+                            <!-- Тема -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding ThemeLabel}"
+                                           Classes="field-label"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding Themes}"
+                                          SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                          Padding="12,10"/>
+                            </StackPanel>
+
+                            <!-- Настройки Email / SMTP -->
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Подключение почты (SMTP)"
+                                           Classes="field-label"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+
+                                <Grid ColumnDefinitions="*,*">
+                                    <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                        <TextBlock Text="SMTP хост"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SmtpHost, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                        <TextBlock Text="Порт"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SmtpPort, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,*">
+                                    <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                                        <TextBlock Text="Логин"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SmtpUser, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                                        <TextBlock Text="Пароль / пароль приложения"
+                                                   Classes="field-label"/>
+                                        <TextBox Text="{Binding SmtpPassword, Mode=TwoWay}"
+                                                 PasswordChar="●"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Отправитель (From Email)"
+                                               Classes="field-label"/>
+                                    <TextBox Text="{Binding FromEmail, Mode=TwoWay}"/>
+                                </StackPanel>
+
+                                <CheckBox Content="Использовать SSL/TLS"
+                                          IsChecked="{Binding SmtpUseSsl, Mode=TwoWay}"/>
+
+                                <TextBlock Text="Подсказка: для Gmail используйте smtp.gmail.com:587 с SSL; для Яндекс — smtp.yandex.ru:465/587; для Mail.ru — smtp.mail.ru:465/587."
+                                           FontSize="11"
+                                           Foreground="{DynamicResource ThemeTextMuted}"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Сообщение о статусе -->
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       Foreground="#4a8a6a"
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       TextWrapping="Wrap"
+                                       Margin="0,10,0,0"/>
+
+                            <!-- Кнопка сохранения -->
+                            <Button Content="{Binding SaveSettingsButton}"
+                                    Classes="action-btn primary-btn"
+                                    Command="{Binding SaveSettingsCommand}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,20,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель -->
+        <Border Grid.Column="0" x:Name="sidebar">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- Верхняя часть боковой панели: просто разделитель -->
+                <Border Padding="16,20" BorderThickness="0,0,0,1" BorderBrush="#3a4a42">
+                    <TextBlock Text="{Binding NavigationLabel}"
+                               FontSize="13"
+                               Foreground="#a0b8b0"
+                               HorizontalAlignment="Left"/>
+                </Border>
+
+                <!-- Навигация -->
+                <StackPanel Grid.Row="1" Spacing="4" Margin="12,20,12,0">
+                    <Button Content="{Binding CounterpartiesLabel}"
+                            Classes="menu"
+                            Command="{Binding ShowCounterpartiesCommand}"/>
+                    <Button Content="{Binding DocumentsLabel}"
+                            Classes="menu"
+                            Command="{Binding ShowDocumentsCommand}"/>
+                    <Button Content="{Binding EventsLabel}"
+                            Classes="menu"
+                            Command="{Binding ShowEventsCommand}"/>
+                    <Button Content="{Binding SettingsLabel}"
+                            Classes="menu"
+                            Command="{Binding ShowSettingsCommand}"/>
+                </StackPanel>
+
+                <!-- Нижняя часть -->
+                <Border Grid.Row="2" Padding="12,20,12,12">
+                    <StackPanel Spacing="8">
+                        <!-- Информация о пользователе скрыта -->
+                        <StackPanel Spacing="6" Margin="12,12,12,0" IsVisible="False">
+                            <TextBlock Text="{Binding CurrentUserName}"
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       Foreground="#e0e8e4"/>
+                            <TextBlock Text="{Binding CurrentUserRole}"
+                                       FontSize="11"
+                                       Foreground="#a0b8b0"/>
+                        </StackPanel>
+                        <Button Content="{Binding LogoutLabel}"
+                                Classes="logout"
+                                Command="{Binding LogoutCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Основной контент -->
+        <Border Grid.Column="1" Background="White">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Верхняя панель -->
+                <Border Background="#f0f5f3" 
+                        BorderBrush="#d9e2e0"
+                        BorderThickness="0,0,0,1"
+                        Padding="24,16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <!-- Информация о пользователе скрыта -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="False">
+                            <TextBlock Text="{Binding CurrentUserName}"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#2d3e36"/>
+                            <TextBlock Text="{Binding CurrentUserRole}"
+                                       FontSize="12"
+                                       Foreground="#5a6a62"
+                                       VerticalAlignment="Center"
+                                       Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding CurrentDateTime, StringFormat='dd.MM.yyyy HH:mm'}"
+                                       FontSize="13"
+                                       Foreground="#5a6a62"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="v1.0"
+                                       FontSize="12"
+                                       Foreground="#8a9a92"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Область контента -->
+                <ContentControl Grid.Row="1" 
+                               Margin="24" 
+                               Content="{Binding CurrentContent}"/>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

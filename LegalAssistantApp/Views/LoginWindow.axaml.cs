@@ -1,22 +1,16 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using LegalAssistantApp.Data;
-using LegalAssistantApp.Services;
+﻿using Avalonia.Controls;
 using LegalAssistantApp.ViewModels;
 
-namespace LegalAssistantApp.Views;
-
-public partial class LoginWindow : Window
+namespace LegalAssistantApp.Views
 {
-    public LoginWindow()
+    public partial class LoginWindow : Window
     {
-        InitializeComponent();
-        DataContext = new AuthViewModel(new AuthService(new AppDbContext()));
-    }
+        public LoginWindow()
+        {
+            InitializeComponent();
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
+            // Создаем AuthViewModel без AuthService (используем конструктор без параметров)
+            DataContext = new AuthViewModel();
+        }
     }
 }
