@@ -1,4 +1,4 @@
-﻿using LegalAssistantApp.Data;
+using LegalAssistantApp.Data;
 using LegalAssistantApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -47,7 +47,43 @@ public class CounterpartyService
 
     public async Task<List<Counterparty>> GetAllCounterpartiesAsync()
     {
-        return await GetCounterpartiesAsync();
+        var list = await GetCounterpartiesAsync();
+
+        // Если в базе по какой-то причине нет ни одного контрагента,
+        // создаём несколько тестовых записей, чтобы раздел не был пустым.
+        if (list.Count == 0)
+        {
+            for (int i = 1; i <= 5; i++)
+            {
+                var cp = new Counterparty
+                {
+                    Name = $"Тестовый контрагент {i}",
+                    Type = i % 2 == 0 ? "Юр.лицо" : "Физ.лицо",
+                    FullName = i % 2 == 0 ? $"ООО \"Тестовый контрагент {i}\"" : $"ИП Тестовый контрагент {i}",
+                    INN = $"{7700001000 + i:D10}",
+                    KPP = $"{770001100 + i:D9}",
+                    OGRN = $"{1027700001000 + i:D13}",
+                    LegalAddress = $"г. Москва, ул. Демо, д.{i}",
+                    Phone = $"+7 (495) 100-0{i:D2}",
+                    Email = $"demo{i}@example.com",
+                    ContactPerson = $"Демо контакт {i}",
+                    Status = "Активен",
+                    RiskLevel = "Низкий",
+                    Notes = "Автоматически созданный тестовый контрагент.",
+                    CreatedByUserId = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                _context.Counterparties.Add(cp);
+            }
+
+            await _context.SaveChangesAsync();
+            list = await GetCounterpartiesAsync();
+        }
+
+        return list;
     }
 
     public async Task<List<Counterparty>> SearchCounterpartiesAsync(string search)
@@ -133,7 +169,7 @@ public class CounterpartyService
             Source = "ФНС (через api-fns.ru)",
             RawData = json,
             ReportData = reportData,
-            RiskLevel = "Unknown",
+            RiskLevel = "Неизвестен",
             RiskScore = 0,
             HasProblems = false,
             CheckDate = DateTime.UtcNow

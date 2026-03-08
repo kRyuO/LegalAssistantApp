@@ -44,10 +44,10 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    // Язык фиксируем на русском: только один вариант в списке
     public List<string> Languages { get; } = new List<string>
     {
-        "ru-RU",
-        "en-US"
+        "ru-RU"
     };
 
     public List<string> Themes { get; } = new List<string>

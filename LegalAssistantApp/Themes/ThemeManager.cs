@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Styling;
+using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,17 +85,18 @@ public class ThemeManager
                 _application.Resources = resources;
             }
 
-            resources["ThemeWindowBackground"] = colors.WindowBackground;
-            resources["ThemeSidebarBackground"] = colors.SidebarBackground;
-            resources["ThemeCardBackground"] = colors.CardBackground;
-            resources["ThemePrimaryColor"] = colors.PrimaryColor;
-            resources["ThemeSecondaryColor"] = colors.SecondaryColor;
-            resources["ThemeTextPrimary"] = colors.TextPrimary;
-            resources["ThemeTextSecondary"] = colors.TextSecondary;
-            resources["ThemeTextMuted"] = colors.TextMuted;
-            resources["ThemeBorderColor"] = colors.BorderColor;
-            resources["ThemeHoverBackground"] = colors.HoverBackground;
-            resources["ThemeSelectedBackground"] = colors.SelectedBackground;
+            // В ресурсах храним именно кисти, иначе Avalonia не сможет применить значения к Background/Foreground/BorderBrush
+            resources["ThemeWindowBackground"] = Brush.Parse(colors.WindowBackground);
+            resources["ThemeSidebarBackground"] = Brush.Parse(colors.SidebarBackground);
+            resources["ThemeCardBackground"] = Brush.Parse(colors.CardBackground);
+            resources["ThemePrimaryColor"] = Brush.Parse(colors.PrimaryColor);
+            resources["ThemeSecondaryColor"] = Brush.Parse(colors.SecondaryColor);
+            resources["ThemeTextPrimary"] = Brush.Parse(colors.TextPrimary);
+            resources["ThemeTextSecondary"] = Brush.Parse(colors.TextSecondary);
+            resources["ThemeTextMuted"] = Brush.Parse(colors.TextMuted);
+            resources["ThemeBorderColor"] = Brush.Parse(colors.BorderColor);
+            resources["ThemeHoverBackground"] = Brush.Parse(colors.HoverBackground);
+            resources["ThemeSelectedBackground"] = Brush.Parse(colors.SelectedBackground);
 
              if (themeName == "Dark")
             {

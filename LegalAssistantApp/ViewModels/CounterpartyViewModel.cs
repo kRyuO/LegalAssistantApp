@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LegalAssistantApp.Models;
 using LegalAssistantApp.Services;
@@ -18,6 +18,7 @@ public partial class CounterpartyViewModel : ObservableObject
     {
         _service = service;
         Counterparties = new ObservableCollection<Counterparty>();
+        _ = LoadCounterpartiesAsync();
     }
 
     [ObservableProperty]

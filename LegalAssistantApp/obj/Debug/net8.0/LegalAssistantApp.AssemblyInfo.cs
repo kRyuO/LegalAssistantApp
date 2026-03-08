@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LegalAssistantApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45f3a6d9d1c4b805d805d8c52de3c24411ac8648")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af6610373f6483b56ae3b809d91a070dc429d7e9")]
 [assembly: System.Reflection.AssemblyProductAttribute("LegalAssistantApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LegalAssistantApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

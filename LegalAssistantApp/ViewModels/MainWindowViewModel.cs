@@ -7,8 +7,10 @@ using System;
 using System.Timers;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using LegalAssistantApp.Models;
+using Avalonia.Threading;
 
 namespace LegalAssistantApp.ViewModels;
 
@@ -179,16 +181,28 @@ public partial class MainWindowViewModel : ObservableObject
     {
         try
         {
-            var events = await _eventService.GetUpcomingEventsAsync(DateTime.Now.AddDays(7));
-            HomeUpcomingEvents.Clear();
-            foreach (var e in events)
+            // Ближайшие 30 дней; если пусто — любые будущие события
+            var events = await _eventService.GetUpcomingEventsAsync(DateTime.Now.AddDays(30));
+            if (events == null || events.Count == 0)
+                events = await _eventService.GetUpcomingEventsAsync(null);
+
+            var list = events ?? new List<DocumentEvent>();
+
+            void UpdateCollection()
             {
-                HomeUpcomingEvents.Add(e);
+                HomeUpcomingEvents.Clear();
+                foreach (var e in list)
+                    HomeUpcomingEvents.Add(e);
             }
+
+            if (Dispatcher.UIThread.CheckAccess())
+                UpdateCollection();
+            else
+                await Dispatcher.UIThread.InvokeAsync(UpdateCollection);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при загрузке событий для главной панели: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Ошибка при загрузке событий для главной панели: {ex.Message}");
         }
     }
 
@@ -286,6 +300,7 @@ public partial class MainWindowViewModel : ObservableObject
         CurrentContent = this;
         var loc = LocalizationService.Instance;
         WelcomeMessage = $"{loc["WelcomeMessage"]}, {CurrentUserName}! Сегодня {DateTime.Now:dd.MM.yyyy}";
+        _ = LoadHomeUpcomingEventsAsync();
     }
 
     [RelayCommand]

@@ -18,6 +18,7 @@
         <converters:DateTimeToNullableConverter x:Key="DateTimeToNullableConverter" />
         <converters:SafeBindingConverter x:Key="SafeBindingConverter" />
         <converters:DecimalConverter x:Key="DecimalConverter" />
+        <converters:StatusRiskToRussianConverter x:Key="StatusRiskToRussianConverter" />
     </Window.Resources>
 
     <Window.Styles>
@@ -75,6 +76,24 @@
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
         </Style>
 
+        <!-- Текст в полях ввода и watermark -->
+        <Style Selector="TextBox TextPresenter">
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource ThemeTextPrimary}" />
+        </Style>
+
+        <Style Selector="TextBox:watermark TextPresenter">
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource ThemeTextMuted}" />
+        </Style>
+
+        <!-- На некоторых темах/контролах водяной знак может быть TextBlock -->
+        <Style Selector="TextBox TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}" />
+        </Style>
+
+        <Style Selector="TextBox:watermark TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextMuted}" />
+        </Style>
+
         <!-- Карточки -->
         <Style Selector="Border.card">
             <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
@@ -125,19 +144,14 @@
             <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}"/>
         </Style>
         
-        <Style Selector="TextBox TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
-        </Style>
-        
-        <Style Selector="TextBox:watermark TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource ThemeTextMuted}"/>
-        </Style>
+        <!-- (дубли ниже удалены; стили выше покрывают ввод и watermark) -->
 
         <!-- Ошибки валидации -->
         <Style Selector="TextBox:validationerror">
             <Setter Property="BorderBrush" Value="#b35454"/>
             <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Background" Value="#ffebee"/>
+            <!-- В Dark-теме не делаем "белый" фон, чтобы текст не пропадал -->
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
         </Style>
 
         <!-- Кнопки действий -->
@@ -228,77 +242,78 @@
         </Style>
 
         <Style Selector="dg|DataGridRow:selected">
-            <Setter Property="Background" Value="#e8f0ed"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeSelectedBackground}"/>
         </Style>
 
         <!-- CheckBox стили -->
         <Style Selector="CheckBox">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="CheckBox:checked">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="CheckBox TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="CheckBox:checked TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
 
         <!-- DatePicker стили -->
         <Style Selector="DatePicker">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#2d3e36"/>
-            <Setter Property="BorderBrush" Value="#c9d2d0"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="6"/>
         </Style>
 
         <Style Selector="DatePicker:focus">
-            <Setter Property="BorderBrush" Value="#5a8a7a"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}"/>
             <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
 
         <Style Selector="DatePicker TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
 
         <!-- ComboBox стили -->
         <Style Selector="ComboBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#2d3e36"/>
-            <Setter Property="BorderBrush" Value="#c9d2d0"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
         </Style>
 
         <Style Selector="ComboBox:focus">
-            <Setter Property="BorderBrush" Value="#5a8a7a"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}"/>
             <Setter Property="BorderThickness" Value="2"/>
         </Style>
 
         <Style Selector="ComboBox TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <!-- ListBox стили -->
         <Style Selector="ListBox">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="ListBoxItem TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="ListBoxItem:selected TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
         
         <Style Selector="ListBoxItem:pointerover TextBlock">
-            <Setter Property="Foreground" Value="#2d3e36"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}"/>
         </Style>
     </Window.Styles>
 
@@ -310,10 +325,10 @@
                     <TextBlock Text="{Binding WelcomeMessage}"
                                FontSize="22"
                                FontWeight="Bold"
-                               Foreground="#2d3e36"/>
+                               Foreground="{DynamicResource ThemeTextPrimary}"/>
                     <TextBlock Text="Выберите раздел в меню слева для начала работы"
                                FontSize="14"
-                               Foreground="#8a9a92"/>
+                               Foreground="{DynamicResource ThemeTextMuted}"/>
                 </StackPanel>
 
                 <!-- Ближайшие события на главной панели -->
@@ -322,30 +337,45 @@
                         <TextBlock Text="{Binding UpcomingEventsTitle}"
                                    FontSize="16"
                                    FontWeight="SemiBold"
-                                   Foreground="#3a4a42"
+                                   Foreground="{DynamicResource ThemeTextPrimary}"
                                    Margin="0,0,0,10"/>
 
-                        <dg:DataGrid Grid.Row="1"
-                                     ItemsSource="{Binding HomeUpcomingEvents}"
-                                     AutoGenerateColumns="False"
-                                     IsReadOnly="True"
-                                     Background="White"
-                                     Foreground="#2d3e36">
-                            <dg:DataGrid.Columns>
-                                <dg:DataGridTextColumn Header="Событие"
-                                                      Binding="{Binding Title}"
-                                                      Width="2*"/>
-                                <dg:DataGridTextColumn Header="Документ"
-                                                      Binding="{Binding Document.Title}"
-                                                      Width="2*"/>
-                                <dg:DataGridTextColumn Header="Срок"
-                                                      Binding="{Binding EventDate, StringFormat='dd.MM.yyyy HH:mm'}"
-                                                      Width="*"/>
-                                <dg:DataGridTextColumn Header="Статус"
-                                                      Binding="{Binding Status}"
-                                                      Width="*"/>
-                            </dg:DataGrid.Columns>
-                        </dg:DataGrid>
+                        <ListBox Grid.Row="1"
+                                 ItemsSource="{Binding HomeUpcomingEvents}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 Background="{DynamicResource ThemeCardBackground}"
+                                 Foreground="{DynamicResource ThemeTextPrimary}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="Transparent" Padding="8,6" Margin="0,1">
+                                        <Grid ColumnDefinitions="2*,2*,*,*">
+                                            <TextBlock Grid.Column="0" Text="{Binding Title}"
+                                                       FontWeight="Medium"
+                                                       Foreground="{DynamicResource ThemeTextPrimary}"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Document.Title, TargetNullValue='-'}"
+                                                       Foreground="{DynamicResource ThemeTextPrimary}"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding EventDate, StringFormat='dd.MM.yyyy HH:mm'}"
+                                                       Foreground="{DynamicResource ThemeTextPrimary}"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Status}"
+                                                       Foreground="{DynamicResource ThemeTextPrimary}"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="{DynamicResource ThemeSelectedBackground}"/>
+                                </Style>
+                                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+                                </Style>
+                            </ListBox.Styles>
+                        </ListBox>
                     </Grid>
                 </Border>
             </Grid>
@@ -397,7 +427,7 @@
                         <TextBlock Text="API ФНС:"
                                    VerticalAlignment="Center"
                                    FontWeight="Medium"
-                                   Foreground="#3a4a42"/>
+                                   Foreground="{DynamicResource ThemeTextPrimary}"/>
                         
                         <TextBox Grid.Column="1"
                                  Height="36"
@@ -414,45 +444,76 @@
                     </Grid>
                     
                     <TextBlock Text="{Binding StatusMessage}"
-                               Foreground="{Binding StatusColor}"
+                               Foreground="{DynamicResource ThemeTextSecondary}"
                                FontSize="13"
                                FontWeight="Medium"/>
                 </StackPanel>
 
                 <!-- Основной контент -->
                 <Grid Grid.Row="1" ColumnDefinitions="2*,*">
-                    <!-- Таблица контрагентов -->
+                    <!-- Список контрагентов (список-таблица) -->
                     <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
                         <Grid RowDefinitions="Auto,*">
                             <TextBlock Text="Список контрагентов"
                                        FontSize="14"
                                        FontWeight="SemiBold"
-                                       Foreground="#3a4a42"
+                                       Foreground="{DynamicResource ThemeTextPrimary}"
                                        Margin="0,0,0,16"/>
 
-                            <dg:DataGrid Grid.Row="1"
-                                        ItemsSource="{Binding Counterparties}"
-                                        SelectedItem="{Binding SelectedCounterparty, Mode=TwoWay}"
-                                        AutoGenerateColumns="False"
-                                        IsReadOnly="True">
-                                <dg:DataGrid.Columns>
-                                    <dg:DataGridTextColumn Header="Наименование"
-                                                          Binding="{Binding Name}"
-                                                          Width="3*"/>
-                                    <dg:DataGridTextColumn Header="ИНН"
-                                                          Binding="{Binding INN}"
-                                                          Width="*"/>
-                                    <dg:DataGridTextColumn Header="ОГРН"
-                                                          Binding="{Binding OGRN}"
-                                                          Width="*"/>
-                                    <dg:DataGridTextColumn Header="Статус"
-                                                          Binding="{Binding Status}"
-                                                          Width="*"/>
-                                    <dg:DataGridTextColumn Header="Риск"
-                                                          Binding="{Binding RiskLevel}"
-                                                          Width="*"/>
-                                </dg:DataGrid.Columns>
-                            </dg:DataGrid>
+                            <ListBox Grid.Row="1"
+                                     ItemsSource="{Binding Counterparties}"
+                                     SelectedItem="{Binding SelectedCounterparty, Mode=TwoWay}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent"
+                                                Padding="6"
+                                                Margin="0,1">
+                                            <Grid ColumnDefinitions="3*,*,*,*,*">
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Name}"
+                                                           FontWeight="Medium"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding INN}"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"/>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding OGRN}"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding Status, Converter={StaticResource StatusRiskToRussianConverter}}"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"/>
+                                                <TextBlock Grid.Column="4"
+                                                           Text="{Binding RiskLevel, Converter={StaticResource StatusRiskToRussianConverter}}"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+                                    </Style>
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
+                                    </Style>
+                                </ListBox.Styles>
+                            </ListBox>
                         </Grid>
                     </Border>
 
@@ -547,58 +608,67 @@
                                 </StackPanel>
 
                                 <!-- Результаты проверки ФНС -->
-                                <Border Background="#e8f0ed"
+                                <Border Background="{DynamicResource ThemeHoverBackground}"
                                         CornerRadius="6"
                                         Padding="16"
                                         Margin="0,20,0,0"
                                         IsVisible="{Binding LastAuditHistory}">
-                                    <StackPanel Spacing="8">
+                                    <StackPanel Spacing="12">
                                         <TextBlock Text="Результаты проверки ФНС"
                                                    FontSize="13"
                                                    FontWeight="SemiBold"
-                                                   Foreground="#3a4a42"/>
-                                        
-                                        <Grid ColumnDefinitions="Auto,*">
-                                            <TextBlock Text="Источник:"
+                                                   Foreground="{DynamicResource ThemeTextPrimary}"
+                                                   Margin="0,0,0,8"/>
+                                        <StackPanel Spacing="6">
+                                            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,6">
+                                                <TextBlock Text="Источник:"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource ThemeTextSecondary}"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding LastAuditHistory.Source}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           Margin="8,0,0,0"
+                                                           VerticalAlignment="Center"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,6">
+                                                <TextBlock Text="Дата проверки:"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource ThemeTextSecondary}"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding LastAuditHistory.CheckDate, StringFormat='dd.MM.yyyy HH:mm'}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           Margin="8,0,0,0"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,6">
+                                                <TextBlock Text="Уровень риска:"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource ThemeTextSecondary}"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding LastAuditHistory.RiskLevel}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="{DynamicResource ThemeTextPrimary}"
+                                                           Margin="8,0,0,0"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <TextBlock Text="Результаты:"
                                                        FontSize="12"
-                                                       Foreground="#5a6a62"/>
-                                            <TextBlock Text="{Binding LastAuditHistory.Source}"
+                                                       Foreground="{DynamicResource ThemeTextSecondary}"
+                                                       Margin="0,4,0,2"/>
+                                            <TextBlock Text="{Binding LastAuditHistory.Findings}"
                                                        FontSize="12"
-                                                       FontWeight="Medium"
-                                                       Foreground="#2d3e36"
-                                                       Margin="8,0,0,0"/>
-                                        </Grid>
-                                        
-                                        <Grid ColumnDefinitions="Auto,*">
-                                            <TextBlock Text="Дата проверки:"
-                                                       FontSize="12"
-                                                       Foreground="#5a6a62"/>
-                                            <TextBlock Text="{Binding LastAuditHistory.CheckDate, StringFormat='dd.MM.yyyy HH:mm'}"
-                                                       FontSize="12"
-                                                       FontWeight="Medium"
-                                                       Foreground="#2d3e36"
-                                                       Margin="8,0,0,0"/>
-                                        </Grid>
-                                        
-                                        <Grid ColumnDefinitions="Auto,*">
-                                            <TextBlock Text="Уровень риска:"
-                                                       FontSize="12"
-                                                       Foreground="#5a6a62"/>
-                                            <TextBlock Text="{Binding LastAuditHistory.RiskLevel}"
-                                                       FontSize="12"
-                                                       FontWeight="Medium"
-                                                       Foreground="#2d3e36"
-                                                       Margin="8,0,0,0"/>
-                                        </Grid>
-                                        
-                                        <TextBlock Text="Результаты:"
-                                                   FontSize="12"
-                                                   Foreground="#5a6a62"
-                                                   Margin="0,4,0,0"/>
-                                        <TextBlock Text="{Binding LastAuditHistory.Findings}"
-                                                   FontSize="12"
-                                                   Foreground="#2d3e36"
-                                                   TextWrapping="Wrap"/>
+                                                       Foreground="{DynamicResource ThemeTextPrimary}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -678,19 +748,19 @@
                 <!-- Основной контент -->
                 <Grid Grid.Row="1" ColumnDefinitions="2*,*">
                     <!-- Таблица документов -->
-                    <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
-                        <Grid RowDefinitions="Auto,Auto,*">
+                    <Border Grid.Column="0" Classes="card" Margin="0,0,12,0" ClipToBounds="True">
+                        <Grid RowDefinitions="Auto,Auto,*" ClipToBounds="True">
                             <TextBlock Text="Список документов"
                                        FontSize="14"
                                        FontWeight="SemiBold"
-                                       Foreground="#3a4a42"
+                                       Foreground="{DynamicResource ThemeTextPrimary}"
                                        Margin="0,0,0,16"/>
 
                             <!-- Отладочная информация -->
                             <TextBlock Grid.Row="1"
                                        Text="{Binding Documents.Count, StringFormat='Количество документов: {0}'}"
                                        FontSize="12"
-                                       Foreground="#8a9a92"
+                                       Foreground="{DynamicResource ThemeTextMuted}"
                                        Margin="0,0,0,8"
                                        IsVisible="{Binding Documents.Count, Converter={StaticResource NotNullToBoolConverter}}"/>
 
@@ -698,12 +768,13 @@
                                     Grid.Row="2"
                                     ItemsSource="{Binding Documents}"
                                     SelectedItem="{Binding SelectedDisplayItem, Mode=TwoWay}"
-                                    Background="White"
-                                    Foreground="#2d3e36"
+                                    Background="{DynamicResource ThemeCardBackground}"
+                                    Foreground="{DynamicResource ThemeTextPrimary}"
                                     MinHeight="500"
                                     VerticalAlignment="Stretch"
                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                    ClipToBounds="True">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="Transparent" Padding="8,6" Margin="0,1" ClipToBounds="True">
@@ -711,35 +782,35 @@
                                                 <TextBlock Grid.Column="0" 
                                                           Text="{Binding Title}" 
                                                           FontWeight="Medium"
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="1" 
                                                           Text="{Binding DocumentNumber, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="2" 
                                                           Text="{Binding DocumentType, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="3" 
                                                           Text="{Binding Status, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="4" 
                                                           Text="{Binding DocumentDateString, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
@@ -750,10 +821,10 @@
                                 </ListBox.ItemTemplate>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="#e8f5e9"/>
+                                        <Setter Property="Background" Value="{DynamicResource ThemeSelectedBackground}"/>
                                     </Style>
                                     <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="#f1f8f4"/>
+                                        <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
                                     </Style>
                                 </ListBox.Styles>
                             </ListBox>
@@ -812,7 +883,13 @@
                                                    Classes="field-label"/>
                                         <ComboBox ItemsSource="{Binding Counterparties}"
                                                   SelectedItem="{Binding SelectedDocument.Counterparty, Mode=TwoWay}"
-                                                  Padding="12,10"/>
+                                                  Padding="12,10">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
 
                                         <CheckBox Content="Конфиденциальный документ"
                                                   IsChecked="{Binding SelectedDocument.IsConfidential, Mode=TwoWay, TargetNullValue=False, FallbackValue=False}"/>
@@ -821,7 +898,7 @@
                                                    Classes="field-label"/>
                                         <TextBlock Text="{Binding SelectedDocument.FileName, TargetNullValue='Файл не выбран', FallbackValue='Файл не выбран'}"
                                                    FontSize="12"
-                                                   Foreground="#5a6a62"/>
+                                                   Foreground="{DynamicResource ThemeTextSecondary}"/>
 
                                         <TextBlock Text="Содержание (краткое описание)"
                                                    Classes="field-label"/>
@@ -862,7 +939,7 @@
                                 <StackPanel Spacing="16" IsVisible="{Binding SelectedDocument, Converter={StaticResource NotNullToBoolConverter}, ConverterParameter=Invert}">
                                     <TextBlock Text="Выберите документ из списка для редактирования"
                                                Classes="section-title"
-                                               Foreground="#8a9a92"
+                                               Foreground="{DynamicResource ThemeTextMuted}"
                                                FontSize="14"
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -892,7 +969,7 @@
                                    Text="{Binding EventsUntilLabel}"
                                    VerticalAlignment="Center"
                                    FontSize="14"
-                                   Foreground="#5a6a62"/>
+                                   Foreground="{DynamicResource ThemeTextSecondary}"/>
                         
                         <DatePicker Grid.Column="2"
                                     SelectedDate="{Binding UntilDate, Mode=TwoWay, Converter={StaticResource DateTimeToNullableConverter}}"
@@ -927,12 +1004,12 @@
                 <Grid Grid.Row="1" ColumnDefinitions="2*,*">
                     <!-- Таблица событий -->
                     <Border Grid.Column="0" Classes="card" Margin="0,0,12,0">
-                        <Grid RowDefinitions="Auto,Auto,*" MinHeight="500">
+                        <Grid RowDefinitions="Auto,Auto,*">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,0,0,16">
                                 <TextBlock Text="{Binding UpcomingEventsLabel}"
                                            FontSize="14"
                                            FontWeight="SemiBold"
-                                           Foreground="#3a4a42"/>
+                                           Foreground="{DynamicResource ThemeTextPrimary}"/>
                                 
                                 <ProgressBar IsIndeterminate="True" 
                                            IsVisible="{Binding IsLoading}"
@@ -943,7 +1020,7 @@
                             <TextBlock Grid.Row="1"
                                        Text="{Binding UpcomingEvents.Count, StringFormat='Количество событий: {0}'}"
                                        FontSize="12"
-                                       Foreground="#8a9a92"
+                                       Foreground="{DynamicResource ThemeTextMuted}"
                                        Margin="0,0,0,8"
                                        IsVisible="{Binding UpcomingEvents.Count, Converter={StaticResource NotNullToBoolConverter}}"/>
 
@@ -951,9 +1028,8 @@
                                     Grid.Row="2"
                                     ItemsSource="{Binding UpcomingEvents}"
                                     SelectedItem="{Binding SelectedDisplayItem, Mode=TwoWay}"
-                                    Background="White"
-                                    Foreground="#2d3e36"
-                                    MinHeight="500"
+                                    Background="{DynamicResource ThemeCardBackground}"
+                                    Foreground="{DynamicResource ThemeTextPrimary}"
                                     VerticalAlignment="Stretch"
                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -964,35 +1040,35 @@
                                                 <TextBlock Grid.Column="0" 
                                                           Text="{Binding Title}" 
                                                           FontWeight="Medium"
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="1" 
                                                           Text="{Binding DocumentTitle, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="2" 
                                                           Text="{Binding EventType, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="3" 
                                                           Text="{Binding EventDateString, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
                                                           ClipToBounds="True"/>
                                                 <TextBlock Grid.Column="4" 
                                                           Text="{Binding Status, TargetNullValue='-'}" 
-                                                          Foreground="#2d3e36"
+                                                          Foreground="{DynamicResource ThemeTextPrimary}"
                                                           VerticalAlignment="Center"
                                                           TextTrimming="CharacterEllipsis"
                                                           TextWrapping="NoWrap"
@@ -1003,10 +1079,10 @@
                                 </ListBox.ItemTemplate>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="#e8f5e9"/>
+                                        <Setter Property="Background" Value="{DynamicResource ThemeSelectedBackground}"/>
                                     </Style>
                                     <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="#f1f8f4"/>
+                                        <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}"/>
                                     </Style>
                                 </ListBox.Styles>
                             </ListBox>
@@ -1071,19 +1147,31 @@
                                                        Classes="field-label"/>
                                             <ComboBox SelectedItem="{Binding SelectedEvent.Document, Mode=TwoWay}"
                                                       ItemsSource="{Binding Documents}"
-                                                      Padding="12,10"/>
+                                                      Padding="12,10">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Title}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
                                             <TextBlock Text="Контрагент"
                                                        Classes="field-label"/>
                                             <ComboBox SelectedItem="{Binding SelectedEvent.Counterparty, Mode=TwoWay}"
                                                       ItemsSource="{Binding Counterparties}"
-                                                      Padding="12,10"/>
+                                                      Padding="12,10">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Name}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </StackPanel>
                                     </Grid>
 
                                     <!-- Настройки напоминания -->
-                                    <Border Background="#e8f0ed"
+                                    <Border Background="{DynamicResource ThemeHoverBackground}"
                                             CornerRadius="6"
                                             Padding="12"
                                             Margin="0,12,0,0">
@@ -1095,7 +1183,7 @@
                                                 <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
                                                     <TextBlock Text="Напомнить за:"
                                                                FontSize="12"
-                                                               Foreground="#5a6a62"/>
+                                                               Foreground="{DynamicResource ThemeTextSecondary}"/>
                                                     <ComboBox ItemsSource="{Binding ReminderOptions}"
                                                               SelectedItem="{Binding SelectedReminderOption, Mode=TwoWay}"
                                                               Padding="12,10"/>
@@ -1103,7 +1191,7 @@
                                                 <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
                                                     <TextBlock Text="Email уведомления:"
                                                                FontSize="12"
-                                                               Foreground="#5a6a62"/>
+                                                               Foreground="{DynamicResource ThemeTextSecondary}"/>
                                                     <TextBox Text="{Binding SelectedEvent.NotificationEmail, Mode=TwoWay, TargetNullValue=''}"
                                                              Padding="12,10"/>
                                                 </StackPanel>
@@ -1145,7 +1233,7 @@
                                             IsVisible="{Binding SelectedEvent, Converter={StaticResource NotNullToBoolConverter}, ConverterParameter=Invert}">
                                     <TextBlock Text="Выберите событие из списка для редактирования"
                                                Classes="section-title"
-                                               Foreground="#8a9a92"
+                                               Foreground="{DynamicResource ThemeTextMuted}"
                                                FontSize="14"
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -1307,6 +1395,7 @@
                         </StackPanel>
                         <Button Content="{Binding LogoutLabel}"
                                 Classes="logout"
+                                HorizontalAlignment="Left"
                                 Command="{Binding LogoutCommand}"/>
                     </StackPanel>
                 </Border>
@@ -1314,11 +1403,11 @@
         </Border>
 
         <!-- Основной контент -->
-        <Border Grid.Column="1" Background="White">
+        <Border Grid.Column="1" Background="{DynamicResource ThemeWindowBackground}">
             <Grid RowDefinitions="Auto,*">
                 <!-- Верхняя панель -->
-                <Border Background="#f0f5f3" 
-                        BorderBrush="#d9e2e0"
+                <Border Background="{DynamicResource ThemeSecondaryColor}" 
+                        BorderBrush="{DynamicResource ThemeBorderColor}"
                         BorderThickness="0,0,0,1"
                         Padding="24,16">
                     <Grid ColumnDefinitions="*,Auto">
@@ -1327,21 +1416,21 @@
                             <TextBlock Text="{Binding CurrentUserName}"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       Foreground="#2d3e36"/>
+                                       Foreground="{DynamicResource ThemeTextPrimary}"/>
                             <TextBlock Text="{Binding CurrentUserRole}"
                                        FontSize="12"
-                                       Foreground="#5a6a62"
+                                       Foreground="{DynamicResource ThemeTextSecondary}"
                                        VerticalAlignment="Center"
                                        Margin="4,0,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                             <TextBlock Text="{Binding CurrentDateTime, StringFormat='dd.MM.yyyy HH:mm'}"
                                        FontSize="13"
-                                       Foreground="#5a6a62"
+                                       Foreground="{DynamicResource ThemeTextSecondary}"
                                        VerticalAlignment="Center"/>
                             <TextBlock Text="v1.0"
                                        FontSize="12"
-                                       Foreground="#8a9a92"
+                                       Foreground="{DynamicResource ThemeTextMuted}"
                                        VerticalAlignment="Center"
                                        Margin="8,0,0,0"/>
                         </StackPanel>

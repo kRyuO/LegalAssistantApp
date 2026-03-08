@@ -11,6 +11,45 @@
         FontFamily="Segoe UI">
 
   <Window.Styles>
+    <!-- Поля ввода: чёткий контур, как в основном окне -->
+    <Style Selector="TextBox">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderColor}" />
+      <Setter Property="Background" Value="{DynamicResource ThemeCardBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ThemeHoverBackground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemePrimaryColor}" />
+    </Style>
+
+    <!-- В Avalonia ввод рисуется через TextPresenter внутри шаблона -->
+    <Style Selector="TextBox TextPresenter">
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource ThemeTextPrimary}" />
+    </Style>
+
+    <Style Selector="TextBox:watermark TextPresenter">
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource ThemeTextMuted}" />
+    </Style>
+
+    <!-- На некоторых темах/контролах водяной знак может быть TextBlock -->
+    <Style Selector="TextBox TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimary}" />
+    </Style>
+
+    <Style Selector="TextBox:watermark TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeTextMuted}" />
+    </Style>
+
     <Style Selector="Button.login">
       <Setter Property="Background" Value="{DynamicResource ThemePrimaryColor}" />
       <Setter Property="Foreground" Value="White" />
@@ -54,7 +93,8 @@
                      Foreground="{DynamicResource ThemeTextPrimary}" />
           <TextBox Text="{Binding Username}"
                    Watermark="Введите логин"
-                   Height="32" />
+                   Height="40"
+                   VerticalContentAlignment="Center" />
         </StackPanel>
 
         <StackPanel Spacing="6">
@@ -64,11 +104,12 @@
           <TextBox Text="{Binding Password}"
                    PasswordChar="●"
                    Watermark="Введите пароль"
-                   Height="32" />
+                   Height="40"
+                   VerticalContentAlignment="Center" />
         </StackPanel>
 
         <TextBlock Text="{Binding ErrorMessage}"
-                   Foreground="#d32f2f"
+                  Foreground="#d32f2f"
                    FontWeight="SemiBold"
                    HorizontalAlignment="Center"
                    TextWrapping="Wrap"
@@ -85,11 +126,6 @@
                 HorizontalAlignment="Center"
                 Margin="0,12,0,0" />
 
-        <TextBlock Text="Тестовый доступ: admin / admin123"
-                   FontSize="11"
-                   Foreground="{DynamicResource ThemeTextMuted}"
-                   HorizontalAlignment="Center"
-                   Margin="0,4,0,0" />
       </StackPanel>
     </Border>
   </Grid>

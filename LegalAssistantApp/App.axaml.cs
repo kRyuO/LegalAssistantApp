@@ -24,6 +24,7 @@ public partial class App : Application
         {
             using (var context = new AppDbContext())
             {
+                await DbSchemaUpdater.EnsureUpToDateAsync(context);
                 await DbInitializer.InitializeAsync(context);
             }
 
